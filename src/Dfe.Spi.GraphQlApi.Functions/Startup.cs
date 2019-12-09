@@ -1,0 +1,69 @@
+using System.IO;
+using Dfe.Spi.Common.Logging;
+using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes;
+using Dfe.Spi.GraphQlApi.Domain.Configuration;
+using Dfe.Spi.GraphQlApi.Functions;
+using GraphQL;
+using GraphQL.Http;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+[assembly: FunctionsStartup(typeof(Startup))]
+namespace Dfe.Spi.GraphQlApi.Functions
+{
+    public class Startup : FunctionsStartup
+    {
+        private IConfigurationRoot _rawConfiguration;
+        private GraphApiConfiguration _configuration;
+        
+        public override void Configure(IFunctionsHostBuilder builder)
+        {
+            var services = builder.Services;
+
+            LoadAndAddConfiguration(services);
+            AddLogging(services);
+            AddGraphQL(services);
+        }
+
+        private void LoadAndAddConfiguration(IServiceCollection services)
+        {
+            _rawConfiguration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("local.settings.json", true)
+                .AddEnvironmentVariables(prefix: "SPI_")
+                .Build();
+            services.AddSingleton(_rawConfiguration);
+
+            _configuration = new GraphApiConfiguration();
+            _rawConfiguration.Bind(_configuration);
+            services.AddSingleton(_configuration);
+        }
+
+        private void AddLogging(IServiceCollection services)
+        {
+            services.AddLogging();
+            services.AddScoped(typeof(ILogger<>), typeof(Logger<>));
+            services.AddScoped<ILogger>(provider =>
+                provider.GetService<ILoggerFactory>().CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
+            services.AddScoped<ILoggerWrapper, LoggerWrapper>();
+        }
+
+        private void AddGraphQL(IServiceCollection services)
+        {
+            services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver((type) =>
+            {
+                var instance = s.GetRequiredService(type);
+                return instance;
+            }));
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddScoped<LearningProviderType>();
+            services.AddScoped<SpiQuery>();
+            services.AddScoped<SpiSchema>();
+        }
+    }
+}
