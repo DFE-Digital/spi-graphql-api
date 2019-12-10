@@ -23,5 +23,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Application\Dfe.Spi.GraphQlApi.Application.csproj" />
       <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Domain\Dfe.Spi.GraphQlApi.Domain.csproj" />
+      <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Infrastructure.SearchApi\Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.csproj" />
     </ItemGroup>
 </Project>

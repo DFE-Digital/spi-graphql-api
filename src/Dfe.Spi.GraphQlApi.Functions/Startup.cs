@@ -1,9 +1,14 @@
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Dfe.Spi.Common.Logging;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
+using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
+using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.GraphQlApi.Functions;
+using Dfe.Spi.GraphQlApi.Infrastructure.SearchApi;
 using GraphQL;
 using GraphQL.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -26,6 +31,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
 
             LoadAndAddConfiguration(services);
             AddLogging(services);
+            AddSearch(services);
+            AddResolvers(services);
             AddGraphQL(services);
         }
 
@@ -52,6 +59,20 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<ILoggerWrapper, LoggerWrapper>();
         }
 
+        private void AddResolvers(IServiceCollection services)
+        {
+            var resolverType = typeof(IResolver<>);
+            var resolvers = resolverType.Assembly.GetTypes().Where(t => t.GetInterface(resolverType.FullName) != null && t.IsClass);
+            foreach (var resolver in resolvers)
+            {
+                var parentResolverInterfaces = resolver.GetInterfaces().Where(t => t.GetInterface(resolverType.FullName)!=null);
+                foreach (var parentResolverInterface in parentResolverInterfaces)
+                {
+                    services.AddScoped(parentResolverInterface, resolver);
+                }
+            }
+        }
+        
         private void AddGraphQL(IServiceCollection services)
         {
             services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver((type) =>
@@ -64,6 +85,11 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<LearningProviderType>();
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
+        }
+
+        private void AddSearch(IServiceCollection services)
+        {
+            services.AddScoped<ISearchProvider, SearchApiSearchProvider>();
         }
     }
 }
