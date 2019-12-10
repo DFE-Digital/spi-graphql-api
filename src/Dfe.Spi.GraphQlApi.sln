@@ -10,6 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{974B2A5B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Domain.UnitTests", "Dfe.Spi.GraphQlApi.Domain.UnitTests\Dfe.Spi.GraphQlApi.Domain.UnitTests.csproj", "{79CDCB7A-124A-4678-99B8-E87596DE6B12}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{A8B12E16-896C-4F68-9670-E73990E1D4EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{330BC72B-32FA-4051-AE7B-34E914DCCEB4}"
+ProjectSection(SolutionItems) = preProject
+	..\pipelines\build.yml = ..\pipelines\build.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,5 +42,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{79CDCB7A-124A-4678-99B8-E87596DE6B12} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
+		{330BC72B-32FA-4051-AE7B-34E914DCCEB4} = {A8B12E16-896C-4F68-9670-E73990E1D4EE}
 	EndGlobalSection
 EndGlobal
