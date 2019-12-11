@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Functions", "Dfe.Spi.GraphQlApi.Functions\Dfe.Spi.GraphQlApi.Functions.csproj", "{59443D29-ACA2-469D-959F-5BBA483FE176}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Application", "Dfe.Spi.GraphQlApi.Application\Dfe.Spi.GraphQlApi.Application.csproj", "{08E9EE1A-6FF1-4DA2-9751-6185FAEA72D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Domain", "Dfe.Spi.GraphQlApi.Domain\Dfe.Spi.GraphQlApi.Domain.csproj", "{BE62C4CF-4F4E-4707-AA2D-A2E1756EA802}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{974B2A5B-6100-49EF-960A-9A2E68FB5FCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Domain.UnitTests", "Dfe.Spi.GraphQlApi.Domain.UnitTests\Dfe.Spi.GraphQlApi.Domain.UnitTests.csproj", "{79CDCB7A-124A-4678-99B8-E87596DE6B12}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{A8B12E16-896C-4F68-9670-E73990E1D4EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{330BC72B-32FA-4051-AE7B-34E914DCCEB4}"
+ProjectSection(SolutionItems) = preProject
+	..\pipelines\build.yml = ..\pipelines\build.yml
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59443D29-ACA2-469D-959F-5BBA483FE176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59443D29-ACA2-469D-959F-5BBA483FE176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59443D29-ACA2-469D-959F-5BBA483FE176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59443D29-ACA2-469D-959F-5BBA483FE176}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E9EE1A-6FF1-4DA2-9751-6185FAEA72D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E9EE1A-6FF1-4DA2-9751-6185FAEA72D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E9EE1A-6FF1-4DA2-9751-6185FAEA72D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E9EE1A-6FF1-4DA2-9751-6185FAEA72D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE62C4CF-4F4E-4707-AA2D-A2E1756EA802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE62C4CF-4F4E-4707-AA2D-A2E1756EA802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE62C4CF-4F4E-4707-AA2D-A2E1756EA802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE62C4CF-4F4E-4707-AA2D-A2E1756EA802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79CDCB7A-124A-4678-99B8-E87596DE6B12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79CDCB7A-124A-4678-99B8-E87596DE6B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79CDCB7A-124A-4678-99B8-E87596DE6B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79CDCB7A-124A-4678-99B8-E87596DE6B12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79CDCB7A-124A-4678-99B8-E87596DE6B12} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
+		{330BC72B-32FA-4051-AE7B-34E914DCCEB4} = {A8B12E16-896C-4F68-9670-E73990E1D4EE}
+	EndGlobalSection
+EndGlobal

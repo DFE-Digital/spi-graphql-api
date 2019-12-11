@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Dfe.Spi.Common.Logging" Version="1.0.5" />
+      <PackageReference Include="Dfe.Spi.Models" Version="1.0.0" />
+      <PackageReference Include="GraphQL" Version="2.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Domain\Dfe.Spi.GraphQlApi.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
