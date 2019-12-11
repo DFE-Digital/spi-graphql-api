@@ -69,7 +69,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
         private bool IsSearchRequestWithNameFilter(SearchRequest searchRequest, string name)
         {
-            return searchRequest.Filters.Any(f => f.Field == "Name" && f.Value == name);
+            return searchRequest.Filter.Any(f => f.Field == "Name" && f.Value == name);
         }
     }
 }

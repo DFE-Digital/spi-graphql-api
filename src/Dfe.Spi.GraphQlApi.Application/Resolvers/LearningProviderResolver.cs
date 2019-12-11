@@ -23,7 +23,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         {
             var searchResults = await _searchProvider.SearchLearningProvidersAsync(new SearchRequest
             {
-                Filters = new[]
+                Filter = new[]
                 {
                     new SearchFilter
                     {

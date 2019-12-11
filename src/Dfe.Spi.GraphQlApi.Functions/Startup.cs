@@ -16,6 +16,7 @@ using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RestSharp;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Dfe.Spi.GraphQlApi.Functions
@@ -31,6 +32,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
 
             LoadAndAddConfiguration(services);
             AddLogging(services);
+            AddHttp(services);
             AddSearch(services);
             AddResolvers(services);
             AddGraphQL(services);
@@ -48,6 +50,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             _configuration = new GraphApiConfiguration();
             _rawConfiguration.Bind(_configuration);
             services.AddSingleton(_configuration);
+            services.AddSingleton(_configuration.Search);
         }
 
         private void AddLogging(IServiceCollection services)
@@ -57,6 +60,11 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<ILogger>(provider =>
                 provider.GetService<ILoggerFactory>().CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
             services.AddScoped<ILoggerWrapper, LoggerWrapper>();
+        }
+
+        private void AddHttp(IServiceCollection services)
+        {
+            services.AddScoped<IRestClient, RestClient>();
         }
 
         private void AddResolvers(IServiceCollection services)
