@@ -1,26 +1,16 @@
-using System.Threading.Tasks;
-using Dfe.Spi.Models;
+using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
     public class SpiQuery : ObjectGraphType
     {
-        public SpiQuery()
+        public SpiQuery(ILearningProviderResolver learningProviderResolver)
         {
             Field<ListGraphType<LearningProviderType>>("learningProviders",
-                resolve: ResolveLearningProvidersAsync,
+                resolve: learningProviderResolver.ResolveAsync,
                 arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> {Name = "name"}));
-        }
-
-        private async Task<LearningProvider[]> ResolveLearningProvidersAsync(ResolveFieldContext<object> context)
-        {
-            return new[]
-            {
-                new LearningProvider {Name = "Provider 1"},
-                new LearningProvider {Name = "Provider 2"},
-            };
         }
     }
 }
