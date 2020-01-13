@@ -41,7 +41,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new EntityCollection<LearningProvider>
                 {
-                    Entities = new LearningProvider[0],
+                    SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
 
             _resolver = new LearningProviderResolver(
@@ -90,17 +90,29 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test, NonRecursiveAutoData]
-        public async Task ThenItShouldReturnEntitiesFromRepo(EntityCollection<LearningProvider> entities)
+        public async Task ThenItShouldReturnEntitiesFromRepo(LearningProvider[] entities)
         {
             _entityRepositoryMock.Setup(r =>
                     r.LoadLearningProvidersAsync(It.IsAny<LoadLearningProvidersRequest>(),
                         It.IsAny<CancellationToken>()))
-                .ReturnsAsync(entities);
+                .ReturnsAsync(new EntityCollection<LearningProvider>
+                {
+                    SquashedEntityResults = entities.Select(e =>
+                        new SquashedEntityResult<LearningProvider>
+                        {
+                            SquashedEntity = e,
+                        }).ToArray(),
+                });
             var context = BuildResolveFieldContext();
 
             var actual = await _resolver.ResolveAsync(context);
 
-            Assert.AreSame(entities.Entities, actual);
+            Assert.AreEqual(entities.Length, actual.Length);
+            for (var i = 0; i < entities.Length; i++)
+            {
+                Assert.AreSame(entities[i], actual[i],
+                    $"Expected {i} to be {entities[i]} but was {actual[i]}");
+            }
         }
 
 
@@ -129,9 +141,10 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             foreach (var document in searchResults.Documents)
             {
-                if (!request.EntityReferences.Any(r =>
-                    r.SourceSystemName == document.SourceSystemName &&
-                    r.SourceSystemId == document.SourceSystemId))
+                if (!request.EntityReferences.Any(er =>
+                    er.AdapterRecordReferences.Any(arr =>
+                        arr.SourceSystemName == document.SourceSystemName &&
+                        arr.SourceSystemId == document.SourceSystemId)))
                 {
                     return false;
                 }

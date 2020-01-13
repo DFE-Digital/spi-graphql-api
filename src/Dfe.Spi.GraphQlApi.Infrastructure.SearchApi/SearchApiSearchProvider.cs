@@ -20,7 +20,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
         {
             _restClient = restClient;
             _restClient.BaseUrl = new Uri(configuration.SearchApiBaseUrl, UriKind.Absolute);
-            
+            if (!string.IsNullOrEmpty(configuration.SearchApiFunctionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SearchApiFunctionKey,
+                    ParameterType.HttpHeader));
+            }
+
             _logger = logger;
         }
         

@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
@@ -27,7 +29,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
         {
-            var references = await SearchAsync(context, context.CancellationToken);
+            var searchResults = await SearchAsync(context, context.CancellationToken);
+
+            var references = await GetSynonymousIdentifiersAsync(searchResults, context.CancellationToken);
 
             var entities = await LoadAsync(references, context.CancellationToken);
 
@@ -55,7 +59,19 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             return searchResults.Documents;
         }
 
-        private async Task<LearningProvider[]> LoadAsync(LearningProviderReference[] references,
+        private async Task<AggregateEntityReference<LearningProviderReference>[]> GetSynonymousIdentifiersAsync(
+            LearningProviderReference[] references,
+            CancellationToken cancellationToken)
+        {
+            // TODO: Go to registry to expand
+            return references.Select(r =>
+                new AggregateEntityReference<LearningProviderReference>
+                {
+                    AdapterRecordReferences = new[] {r},
+                }).ToArray();
+        }
+
+        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference<LearningProviderReference>[] references,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest
@@ -64,7 +80,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             };
             var loadResult = await _entityRepository.LoadLearningProvidersAsync(request, cancellationToken);
 
-            return loadResult.Entities;
+            return loadResult.SquashedEntityResults.Select(x => x.SquashedEntity).ToArray();
         }
     }
 }
