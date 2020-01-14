@@ -1,4 +1,5 @@
 using Dfe.Spi.GraphQlApi.Domain.Search;
+using Dfe.Spi.Models;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Repository
 {
@@ -6,7 +7,7 @@ namespace Dfe.Spi.GraphQlApi.Domain.Repository
     {
         public LoadLearningProvidersRequest()
         {
-            EntityName = "LearningProvider";
+            EntityName = nameof(LearningProvider);
         }
     }
 }
