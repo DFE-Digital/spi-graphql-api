@@ -44,7 +44,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
                         AdapterRecordReferences = er.AdapterRecordReferences.Select(arr =>
                             new SquasherAdapterReference
                             {
-                                Source = TranslateSourceSystem(arr.SourceSystemName),
+                                Source = arr.SourceSystemName,
                                 Id = arr.SourceSystemId,
                             }).ToArray(),
                     })?.ToArray(),
@@ -68,16 +68,6 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(results)}");
 
             return results;
-        }
-
-        private string TranslateSourceSystem(string commonName)
-        {
-            if (commonName.Equals("UKRLP"))
-            {
-                return "ukrlp-adapter";
-            }
-
-            return "gias-adapter";
         }
     }
 

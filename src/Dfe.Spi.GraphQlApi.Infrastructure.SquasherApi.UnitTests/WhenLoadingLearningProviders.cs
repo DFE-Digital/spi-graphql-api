@@ -70,7 +70,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                         AdapterRecordReferences = er.AdapterRecordReferences.Select(arr=>
                             new SquasherAdapterReference
                             {
-                                Source = "gias-adapter",
+                                Source = arr.SourceSystemName,
                                 Id = arr.SourceSystemId,
                             }).ToArray(),
                     }).ToArray(),
