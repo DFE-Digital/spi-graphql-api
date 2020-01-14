@@ -6,9 +6,11 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
+using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.GraphQlApi.Functions;
 using Dfe.Spi.GraphQlApi.Infrastructure.SearchApi;
+using Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi;
 using GraphQL;
 using GraphQL.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -16,6 +18,8 @@ using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RestSharp;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -29,11 +33,19 @@ namespace Dfe.Spi.GraphQlApi.Functions
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var services = builder.Services;
+            
+            // Setup JSON serialization
+            JsonConvert.DefaultSettings =
+                () => new JsonSerializerSettings()
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                };
 
             LoadAndAddConfiguration(services);
             AddLogging(services);
             AddHttp(services);
             AddSearch(services);
+            AddEntityRepository(services);
             AddResolvers(services);
             AddGraphQL(services);
         }
@@ -51,6 +63,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             _rawConfiguration.Bind(_configuration);
             services.AddSingleton(_configuration);
             services.AddSingleton(_configuration.Search);
+            services.AddSingleton(_configuration.EntityRepository);
         }
 
         private void AddLogging(IServiceCollection services)
@@ -64,7 +77,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
 
         private void AddHttp(IServiceCollection services)
         {
-            services.AddScoped<IRestClient, RestClient>();
+            services.AddTransient<IRestClient, RestClient>();
         }
 
         private void AddResolvers(IServiceCollection services)
@@ -98,6 +111,11 @@ namespace Dfe.Spi.GraphQlApi.Functions
         private void AddSearch(IServiceCollection services)
         {
             services.AddScoped<ISearchProvider, SearchApiSearchProvider>();
+        }
+
+        private void AddEntityRepository(IServiceCollection services)
+        {
+            services.AddScoped<IEntityRepository, SquasherEntityRepository>();
         }
     }
 }

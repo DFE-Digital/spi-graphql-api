@@ -23,6 +23,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Applicat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.UnitTests", "Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.UnitTests\Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.UnitTests.csproj", "{115315D9-1BD5-4982-8532-16CC2B7C8891}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi", "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi\Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.csproj", "{0982790F-F10B-4790-A486-6BF3EC85FA6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests", "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests\Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests.csproj", "{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release", "Release", "{09FFE760-7A04-408F-B05F-B434FDAFB69D}"
+ProjectSection(SolutionItems) = preProject
+	..\azure\template.json = ..\azure\template.json
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,11 +66,21 @@ Global
 		{115315D9-1BD5-4982-8532-16CC2B7C8891}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{115315D9-1BD5-4982-8532-16CC2B7C8891}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{115315D9-1BD5-4982-8532-16CC2B7C8891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0982790F-F10B-4790-A486-6BF3EC85FA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0982790F-F10B-4790-A486-6BF3EC85FA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0982790F-F10B-4790-A486-6BF3EC85FA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0982790F-F10B-4790-A486-6BF3EC85FA6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{79CDCB7A-124A-4678-99B8-E87596DE6B12} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
 		{330BC72B-32FA-4051-AE7B-34E914DCCEB4} = {A8B12E16-896C-4F68-9670-E73990E1D4EE}
 		{8325E699-E84B-4A62-A52D-664AD0139FDA} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
 		{115315D9-1BD5-4982-8532-16CC2B7C8891} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
+		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
+		{09FFE760-7A04-408F-B05F-B434FDAFB69D} = {A8B12E16-896C-4F68-9670-E73990E1D4EE}
 	EndGlobalSection
 EndGlobal

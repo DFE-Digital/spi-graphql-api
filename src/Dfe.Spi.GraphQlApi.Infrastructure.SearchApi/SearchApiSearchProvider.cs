@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Newtonsoft.Json;
@@ -19,7 +20,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
         {
             _restClient = restClient;
             _restClient.BaseUrl = new Uri(configuration.SearchApiBaseUrl, UriKind.Absolute);
-            
+            if (!string.IsNullOrEmpty(configuration.SearchApiFunctionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SearchApiFunctionKey,
+                    ParameterType.HttpHeader));
+            }
+
             _logger = logger;
         }
         
