@@ -110,6 +110,14 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
 
                 Assert.AreEqual(expectedEntity.Name, actualEntity.Name,
                     $"Expected entity {i} to have Name {expectedEntity.Name} but was {actualEntity.Name}");
+                Assert.AreEqual(expectedEntity.LegalName, actualEntity.LegalName,
+                    $"Expected entity {i} to have LegalName {expectedEntity.LegalName} but was {actualEntity.LegalName}");
+                Assert.AreEqual(expectedEntity.Urn, actualEntity.Urn,
+                    $"Expected entity {i} to have Urn {expectedEntity.Urn} but was {actualEntity.Urn}");
+                Assert.AreEqual(expectedEntity.Ukprn, actualEntity.Ukprn,
+                    $"Expected entity {i} to have Ukprn {expectedEntity.Ukprn} but was {actualEntity.Ukprn}");
+                Assert.AreEqual(expectedEntity.Postcode, actualEntity.Postcode,
+                    $"Expected entity {i} to have Postcode {expectedEntity.Postcode} but was {actualEntity.Postcode}");
             }
         }
 
