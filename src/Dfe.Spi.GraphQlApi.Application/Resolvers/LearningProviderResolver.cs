@@ -16,12 +16,12 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         private readonly ISearchProvider _searchProvider;
         private readonly IEntityRepository _entityRepository;
-        private readonly IEntityReferenceBuilder<LearningProviderReference> _entityReferenceBuilder;
+        private readonly IEntityReferenceBuilder _entityReferenceBuilder;
 
         internal LearningProviderResolver(
             ISearchProvider searchProvider,
             IEntityRepository entityRepository,
-            IEntityReferenceBuilder<LearningProviderReference> entityReferenceBuilder)
+            IEntityReferenceBuilder entityReferenceBuilder)
         {
             _searchProvider = searchProvider;
             _entityRepository = entityRepository;
@@ -35,7 +35,8 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             _entityRepository = entityRepository;
             
             _entityReferenceBuilder = new EntityReferenceBuilder<LearningProviderReference>(
-                _searchProvider.SearchLearningProvidersAsync);
+                _searchProvider.SearchLearningProvidersAsync,
+                null); // TODO: link up registry
         }
 
         public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
@@ -58,7 +59,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             return entities;
         }
 
-        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference<LearningProviderReference>[] references,
+        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest

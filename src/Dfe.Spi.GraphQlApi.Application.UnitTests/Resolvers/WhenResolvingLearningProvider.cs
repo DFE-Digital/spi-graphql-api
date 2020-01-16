@@ -19,7 +19,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
     {
         private Mock<ISearchProvider> _searchProviderMock;
         private Mock<IEntityRepository> _entityRepositoryMock;
-        private Mock<IEntityReferenceBuilder<LearningProviderReference>> _entityReferenceBuilderMock;
+        private Mock<IEntityReferenceBuilder> _entityReferenceBuilderMock;
         private LearningProviderResolver _resolver;
 
         [SetUp]
@@ -36,10 +36,10 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
             
-            _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder<LearningProviderReference>>();
+            _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder>();
             _entityReferenceBuilderMock.Setup(b =>
                     b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AggregateEntityReference<LearningProviderReference>[0]);
+                .ReturnsAsync(new AggregateEntityReference[0]);
 
             _resolver = new LearningProviderResolver(
                 _searchProviderMock.Object,
@@ -71,7 +71,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldUseBuiltEntityReferencesToLoadData(AggregateEntityReference<LearningProviderReference>[] entityReferences)
+        public async Task ThenItShouldUseBuiltEntityReferencesToLoadData(AggregateEntityReference[] entityReferences)
         {
             _entityReferenceBuilderMock.Setup(b =>
                     b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))

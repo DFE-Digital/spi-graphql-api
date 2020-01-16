@@ -2,8 +2,8 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Repository
 {
-    public class AggregateEntityReference<T> where T : EntityReference
+    public class AggregateEntityReference
     {
-        public T[] AdapterRecordReferences { get; set; }
+        public EntityReference[] AdapterRecordReferences { get; set; }
     }
 }

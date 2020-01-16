@@ -3,37 +3,51 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
-    internal interface IEntityReferenceBuilder<TEntityReference> where TEntityReference : EntityReference
+    internal interface IEntityReferenceBuilder
     {
-        Task<AggregateEntityReference<TEntityReference>[]> GetEntityReferences(
+        Task<AggregateEntityReference[]> GetEntityReferences(
             SearchRequest searchRequest, CancellationToken cancellationToken);
     }
 
-    internal class EntityReferenceBuilder<TEntityReference> : IEntityReferenceBuilder<TEntityReference> where TEntityReference : EntityReference
+    internal class EntityReferenceBuilder<TEntityReference> : IEntityReferenceBuilder
+        where TEntityReference : EntityReference
     {
         private readonly Func<SearchRequest, CancellationToken, Task<SearchResultSet<TEntityReference>>> _searchFunc;
+        private readonly Func<string, string, CancellationToken, Task<EntityReference[]>> _getSynonymsFunc;
 
         public EntityReferenceBuilder(
-            Func<SearchRequest, CancellationToken, Task<SearchResultSet<TEntityReference>>> searchFunc)
+            Func<SearchRequest, CancellationToken, Task<SearchResultSet<TEntityReference>>> searchFunc,
+            Func<string, string, CancellationToken, Task<EntityReference[]>> getSynonymsFunc)
         {
             _searchFunc = searchFunc;
+            _getSynonymsFunc = getSynonymsFunc;
         }
 
-        public async Task<AggregateEntityReference<TEntityReference>[]> GetEntityReferences(
+        public async Task<AggregateEntityReference[]> GetEntityReferences(
             SearchRequest searchRequest, CancellationToken cancellationToken)
         {
             var searchResults = await _searchFunc(searchRequest, cancellationToken);
-            
-            return searchResults.Documents.Select(r =>
-                new AggregateEntityReference<TEntityReference>
+
+            var references = new AggregateEntityReference[searchResults.Documents.Length];
+            for (var i = 0; i < searchResults.Documents.Length; i++)
+            {
+                var result = searchResults.Documents[i];
+                var synonyms =
+                    await _getSynonymsFunc(result.SourceSystemName, result.SourceSystemId, cancellationToken);
+
+                references[i] = new AggregateEntityReference
                 {
-                    AdapterRecordReferences = new[] {r},
-                }).ToArray();
+                    AdapterRecordReferences = new[] {result}.Concat(synonyms).ToArray(),
+                };
+            }
+
+            return references;
         }
     }
 }
