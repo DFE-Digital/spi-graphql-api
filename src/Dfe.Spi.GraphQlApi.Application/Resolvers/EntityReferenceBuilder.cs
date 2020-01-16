@@ -34,20 +34,23 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         {
             var searchResults = await _searchFunc(searchRequest, cancellationToken);
 
-            var references = new AggregateEntityReference[searchResults.Documents.Length];
-            for (var i = 0; i < searchResults.Documents.Length; i++)
-            {
-                var result = searchResults.Documents[i];
-                var synonyms =
-                    await _getSynonymsFunc(result.SourceSystemName, result.SourceSystemId, cancellationToken);
+            var tasks = searchResults.Documents.Select(source =>
+                GetSynonyms(source, cancellationToken));
 
-                references[i] = new AggregateEntityReference
-                {
-                    AdapterRecordReferences = new[] {result}.Concat(synonyms).ToArray(),
-                };
-            }
+            var references = await Task.WhenAll(tasks);
 
             return references;
+        }
+
+        private async Task<AggregateEntityReference> GetSynonyms(EntityReference source, CancellationToken cancellationToken)
+        {
+            var synonyms = await _getSynonymsFunc(
+                source.SourceSystemName, source.SourceSystemId, cancellationToken);
+
+            return new AggregateEntityReference
+            {
+                AdapterRecordReferences = new[] {source}.Concat(synonyms).ToArray(),
+            };
         }
     }
 }
