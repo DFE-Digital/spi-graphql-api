@@ -39,6 +39,12 @@
     "searchFunctionKey": {
       "type": "string"
     },
+    "registryApiUrl": {
+      "type": "string"
+    },
+    "registryFunctionKey": {
+      "type": "string"
+    },
     "squasherApiUrl": {
       "type": "string"
     },
@@ -157,6 +163,14 @@
             {
               "name": "SPI_Search__SearchApiFunctionKey",
               "value": "[parameters('searchFunctionKey')]"
+            },
+            {
+              "name": "SPI_Registry__RegistryApiBaseUrl",
+              "value": "[parameters('registryApiUrl')]"
+            },
+            {
+              "name": "SPI_Registry__RegistryApiFunctionKey",
+              "value": "[parameters('registryFunctionKey')]"
             },
             {
               "name": "SPI_EntityRepository__SquasherApiBaseUrl",
