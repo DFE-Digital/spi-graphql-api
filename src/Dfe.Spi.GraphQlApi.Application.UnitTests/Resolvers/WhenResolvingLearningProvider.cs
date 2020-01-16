@@ -19,21 +19,13 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
     {
         private Mock<ISearchProvider> _searchProviderMock;
         private Mock<IEntityRepository> _entityRepositoryMock;
+        private Mock<IEntityReferenceBuilder<LearningProviderReference>> _entityReferenceBuilderMock;
         private LearningProviderResolver _resolver;
 
         [SetUp]
         public void Arrange()
         {
             _searchProviderMock = new Mock<ISearchProvider>();
-            _searchProviderMock.Setup(p =>
-                    p.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new SearchResultSet<LearningProviderReference>
-                {
-                    Documents = new[]
-                    {
-                        new LearningProviderReference(),
-                    }
-                });
 
             _entityRepositoryMock = new Mock<IEntityRepository>();
             _entityRepositoryMock.Setup(r =>
@@ -43,10 +35,16 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 {
                     SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
+            
+            _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder<LearningProviderReference>>();
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new AggregateEntityReference<LearningProviderReference>[0]);
 
             _resolver = new LearningProviderResolver(
                 _searchProviderMock.Object,
-                _entityRepositoryMock.Object);
+                _entityRepositoryMock.Object,
+                _entityReferenceBuilderMock.Object);
         }
 
         [Test]
@@ -60,33 +58,32 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldUseNameArgToSearchForLearningProviderReferences(string name)
+        public async Task ThenItShouldUseNameArgAsSearchCriteria(string name)
         {
             var context = BuildResolveFieldContext(name);
 
             await _resolver.ResolveAsync(context);
 
-            _searchProviderMock.Verify(
-                p => p.SearchLearningProvidersAsync(It.Is<SearchRequest>(r => IsSearchRequestWithNameFilter(r, name)),
+            _entityReferenceBuilderMock.Verify(
+                p => p.GetEntityReferences(It.Is<SearchRequest>(r => IsSearchRequestWithNameFilter(r, name)),
                     context.CancellationToken),
                 Times.Once);
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldUseSearchReferencesToLoadEntities(
-            SearchResultSet<LearningProviderReference> searchResults)
+        public async Task ThenItShouldUseBuiltEntityReferencesToLoadData(AggregateEntityReference<LearningProviderReference>[] entityReferences)
         {
-            _searchProviderMock.Setup(p =>
-                    p.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(searchResults);
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(entityReferences);
             var context = BuildResolveFieldContext();
-
+            
             await _resolver.ResolveAsync(context);
-
-            _entityRepositoryMock.Verify(r =>
-                r.LoadLearningProvidersAsync(
-                    It.Is<LoadLearningProvidersRequest>(req => IsLoadRequestForSearchResults(req, searchResults)),
-                    context.CancellationToken));
+            
+            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
+                It.Is<LoadLearningProvidersRequest>(req=>req.EntityReferences == entityReferences),
+                context.CancellationToken),
+                Times.Once);
         }
 
         [Test, NonRecursiveAutoData]
@@ -104,9 +101,9 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         }).ToArray(),
                 });
             var context = BuildResolveFieldContext();
-
+        
             var actual = await _resolver.ResolveAsync(context);
-
+        
             Assert.AreEqual(entities.Length, actual.Length);
             for (var i = 0; i < entities.Length; i++)
             {

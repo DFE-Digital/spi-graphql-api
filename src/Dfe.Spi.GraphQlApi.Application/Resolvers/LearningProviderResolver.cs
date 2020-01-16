@@ -1,8 +1,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dfe.Spi.GraphQlApi.Domain.Common;
-using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
@@ -18,28 +16,29 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         private readonly ISearchProvider _searchProvider;
         private readonly IEntityRepository _entityRepository;
+        private readonly IEntityReferenceBuilder<LearningProviderReference> _entityReferenceBuilder;
 
+        internal LearningProviderResolver(
+            ISearchProvider searchProvider,
+            IEntityRepository entityRepository,
+            IEntityReferenceBuilder<LearningProviderReference> entityReferenceBuilder)
+        {
+            _searchProvider = searchProvider;
+            _entityRepository = entityRepository;
+            _entityReferenceBuilder = entityReferenceBuilder;
+        }
         public LearningProviderResolver(
             ISearchProvider searchProvider,
             IEntityRepository entityRepository)
         {
             _searchProvider = searchProvider;
             _entityRepository = entityRepository;
+            
+            _entityReferenceBuilder = new EntityReferenceBuilder<LearningProviderReference>(
+                _searchProvider.SearchLearningProvidersAsync);
         }
 
         public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
-        {
-            var searchResults = await SearchAsync(context, context.CancellationToken);
-
-            var references = await GetSynonymousIdentifiersAsync(searchResults, context.CancellationToken);
-
-            var entities = await LoadAsync(references, context.CancellationToken);
-
-            return entities;
-        }
-
-        private async Task<LearningProviderReference[]> SearchAsync<T>(ResolveFieldContext<T> context,
-            CancellationToken cancellationToken)
         {
             var request = new SearchRequest
             {
@@ -52,23 +51,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     },
                 }
             };
+            var references = await _entityReferenceBuilder.GetEntityReferences(request, context.CancellationToken);
 
-            var searchResults =
-                await _searchProvider.SearchLearningProvidersAsync(request, cancellationToken);
+            var entities = await LoadAsync(references, context.CancellationToken);
 
-            return searchResults.Documents;
-        }
-
-        private async Task<AggregateEntityReference<LearningProviderReference>[]> GetSynonymousIdentifiersAsync(
-            LearningProviderReference[] references,
-            CancellationToken cancellationToken)
-        {
-            // TODO: Go to registry to expand
-            return references.Select(r =>
-                new AggregateEntityReference<LearningProviderReference>
-                {
-                    AdapterRecordReferences = new[] {r},
-                }).ToArray();
+            return entities;
         }
 
         private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference<LearningProviderReference>[] references,
