@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
@@ -19,6 +20,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
     public class WhenResolvingLearningProvider
     {
         private Mock<IEntityRepository> _entityRepositoryMock;
+        private Mock<ILoggerWrapper> _loggerMock;
         private Mock<IEntityReferenceBuilder> _entityReferenceBuilderMock;
         private LearningProviderResolver _resolver;
 
@@ -34,6 +36,8 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
             
+            _loggerMock = new Mock<ILoggerWrapper>();
+            
             _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder>();
             _entityReferenceBuilderMock.Setup(b =>
                     b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
@@ -41,6 +45,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             _resolver = new LearningProviderResolver(
                 _entityRepositoryMock.Object,
+                _loggerMock.Object,
                 _entityReferenceBuilderMock.Object);
         }
 
