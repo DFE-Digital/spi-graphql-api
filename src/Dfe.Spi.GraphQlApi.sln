@@ -32,6 +32,10 @@ ProjectSection(SolutionItems) = preProject
 	..\azure\template.json = ..\azure\template.json
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi", "Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi\Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.csproj", "{4FF4B32B-2DBE-46C8-A026-50C21D6E2EB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests", "Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests\Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests.csproj", "{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,14 @@ Global
 		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FF4B32B-2DBE-46C8-A026-50C21D6E2EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FF4B32B-2DBE-46C8-A026-50C21D6E2EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FF4B32B-2DBE-46C8-A026-50C21D6E2EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FF4B32B-2DBE-46C8-A026-50C21D6E2EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{79CDCB7A-124A-4678-99B8-E87596DE6B12} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
@@ -82,5 +94,6 @@ Global
 		{115315D9-1BD5-4982-8532-16CC2B7C8891} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
 		{8560E1D3-2F0A-4B22-83EA-D29B93A5CDFB} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
 		{09FFE760-7A04-408F-B05F-B434FDAFB69D} = {A8B12E16-896C-4F68-9670-E73990E1D4EE}
+		{F829EB6C-5939-4BA7-ABA5-8B451AC1FBBF} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
 	EndGlobalSection
 EndGlobal
