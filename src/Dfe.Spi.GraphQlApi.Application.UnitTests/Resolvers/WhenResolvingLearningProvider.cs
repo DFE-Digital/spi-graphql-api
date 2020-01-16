@@ -88,6 +88,27 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 Times.Once);
         }
 
+        [Test, AutoData]
+        public async Task ThenItShouldRequestFieldsFromGraphQuery(AggregateEntityReference[] entityReferences)
+        {
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(entityReferences);
+            var fields = new[] {"name", "postcode"};
+            var context = BuildResolveFieldContext(fields: fields);
+            
+            await _resolver.ResolveAsync(context);
+            
+            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
+                It.Is<LoadLearningProvidersRequest>(req=>
+                    req.Fields != null &&
+                    req.Fields.Length == 2 &&
+                    req.Fields[0] == fields[0] &&
+                    req.Fields[1] == fields[1]),
+                context.CancellationToken),
+                Times.Once);
+        }
+
         [Test, NonRecursiveAutoData]
         public async Task ThenItShouldReturnEntitiesFromRepo(LearningProvider[] entities)
         {
@@ -115,41 +136,17 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null)
+        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null)
         {
             return TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
             {
                 {"name", name ?? Guid.NewGuid().ToString()},
-            });
+            }, fields: fields);
         }
 
         private bool IsSearchRequestWithNameFilter(SearchRequest searchRequest, string name)
         {
             return searchRequest.Filter.Any(f => f.Field == "Name" && f.Value == name);
-        }
-
-        private bool IsLoadRequestForSearchResults(LoadLearningProvidersRequest request,
-            SearchResultSet<LearningProviderReference> searchResults)
-        {
-            if (request == null
-                || request.EntityReferences == null
-                || request.EntityReferences.Length != searchResults.Documents.Length)
-            {
-                return false;
-            }
-
-            foreach (var document in searchResults.Documents)
-            {
-                if (!request.EntityReferences.Any(er =>
-                    er.AdapterRecordReferences.Any(arr =>
-                        arr.SourceSystemName == document.SourceSystemName &&
-                        arr.SourceSystemId == document.SourceSystemId)))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

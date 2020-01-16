@@ -8,6 +8,7 @@ using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
@@ -65,7 +66,8 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 };
                 var references = await _entityReferenceBuilder.GetEntityReferences(request, context.CancellationToken);
 
-                var entities = await LoadAsync(references, context.CancellationToken);
+                var fields = GetRequestedFields(context);
+                var entities = await LoadAsync(references, fields, context.CancellationToken);
 
                 return entities;
             }
@@ -76,16 +78,23 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
         }
 
-        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references,
+        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references, string[] fields,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest
             {
                 EntityReferences = references,
+                Fields = fields,
             };
             var loadResult = await _entityRepository.LoadLearningProvidersAsync(request, cancellationToken);
 
             return loadResult.SquashedEntityResults.Select(x => x.SquashedEntity).ToArray();
+        }
+
+        private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
+        {
+            var selections = context.FieldAst.SelectionSet.Selections.Select(x=>((Field)x).Name);
+            return selections.ToArray();
         }
     }
 }

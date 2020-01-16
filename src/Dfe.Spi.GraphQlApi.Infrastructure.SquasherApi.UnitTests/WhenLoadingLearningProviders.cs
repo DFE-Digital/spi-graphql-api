@@ -74,7 +74,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                                 Id = arr.SourceSystemId,
                             }).ToArray(),
                     }).ToArray(),
-                Fields = new[] {"Name"},
+                Fields = request.Fields,
             };
             Func<Parameter, bool> isExpectedBody = (body) =>
                 body != null &&
