@@ -10,20 +10,20 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.Name)
                 .Name("name")
                 .Description("Name of the learning provider");
-            
-            Field(x => x.LegalName)
+
+            Field(x => x.LegalName, nullable:true)
                 .Name("legalName")
                 .Description("Legal name of the learning provider");
             
-            Field(x => x.Urn)
+            Field(x => x.Urn, nullable:true)
                 .Name("urn")
                 .Description("URN of the learning provider");
             
-            Field(x => x.Ukprn)
+            Field(x => x.Ukprn, nullable:true)
                 .Name("ukprn")
                 .Description("UKPRN of the learning provider");
             
-            Field(x => x.Postcode)
+            Field(x => x.Postcode, nullable:true)
                 .Name("postcode")
                 .Description("Postcode of the learning provider");
         }
