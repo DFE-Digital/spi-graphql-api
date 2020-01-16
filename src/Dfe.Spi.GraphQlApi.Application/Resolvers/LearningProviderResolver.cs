@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
@@ -14,29 +17,29 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
     public class LearningProviderResolver : ILearningProviderResolver
     {
-        private readonly ISearchProvider _searchProvider;
         private readonly IEntityRepository _entityRepository;
         private readonly IEntityReferenceBuilder _entityReferenceBuilder;
 
         internal LearningProviderResolver(
-            ISearchProvider searchProvider,
             IEntityRepository entityRepository,
             IEntityReferenceBuilder entityReferenceBuilder)
         {
-            _searchProvider = searchProvider;
             _entityRepository = entityRepository;
             _entityReferenceBuilder = entityReferenceBuilder;
         }
         public LearningProviderResolver(
             ISearchProvider searchProvider,
-            IEntityRepository entityRepository)
+            IEntityRepository entityRepository,
+            IRegistryProvider registryProvider)
         {
-            _searchProvider = searchProvider;
             _entityRepository = entityRepository;
-            
+
+            Task<EntityReference[]> GetSynonyms(string sourceSystem, string sourceId, CancellationToken cancellationToken) => 
+                registryProvider.GetSynonymsAsync("learning-providers", sourceSystem, sourceId, cancellationToken);
+
             _entityReferenceBuilder = new EntityReferenceBuilder<LearningProviderReference>(
-                _searchProvider.SearchLearningProvidersAsync,
-                null); // TODO: link up registry
+                searchProvider.SearchLearningProvidersAsync,
+                GetSynonyms);
         }
 
         public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)

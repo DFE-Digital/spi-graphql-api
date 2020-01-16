@@ -1,9 +1,11 @@
+using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Registry
 {
     public interface IRegistryProvider
     {
-        Task<object> GetSynonyms(string entityType, string sourceSystem, string sourceSystemId);
+        Task<EntityReference[]> GetSynonymsAsync(string entityType, string sourceSystem, string sourceSystemId, CancellationToken cancellationToken);
     }
 }

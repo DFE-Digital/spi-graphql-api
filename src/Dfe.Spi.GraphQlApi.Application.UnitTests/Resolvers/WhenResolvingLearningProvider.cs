@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
+using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
@@ -17,7 +18,6 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 {
     public class WhenResolvingLearningProvider
     {
-        private Mock<ISearchProvider> _searchProviderMock;
         private Mock<IEntityRepository> _entityRepositoryMock;
         private Mock<IEntityReferenceBuilder> _entityReferenceBuilderMock;
         private LearningProviderResolver _resolver;
@@ -25,8 +25,6 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         [SetUp]
         public void Arrange()
         {
-            _searchProviderMock = new Mock<ISearchProvider>();
-
             _entityRepositoryMock = new Mock<IEntityRepository>();
             _entityRepositoryMock.Setup(r =>
                     r.LoadLearningProvidersAsync(It.IsAny<LoadLearningProvidersRequest>(),
@@ -42,7 +40,6 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 .ReturnsAsync(new AggregateEntityReference[0]);
 
             _resolver = new LearningProviderResolver(
-                _searchProviderMock.Object,
                 _entityRepositoryMock.Object,
                 _entityReferenceBuilderMock.Object);
         }
