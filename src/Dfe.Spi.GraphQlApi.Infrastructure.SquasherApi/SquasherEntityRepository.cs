@@ -48,7 +48,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
                                 Id = arr.SourceSystemId,
                             }).ToArray(),
                     })?.ToArray(),
-                Fields = new[] {"Name"},
+                Fields = request.Fields,
             };
             var json = JsonConvert.SerializeObject(squasherRequest);
             _logger.Debug($"Search request going to {resource} is {json}");
