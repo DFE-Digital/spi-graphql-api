@@ -107,6 +107,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             }));
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddScoped<LearningProviderStatusEnum>();
             services.AddScoped<LearningProviderType>();
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
