@@ -26,6 +26,14 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.Postcode, nullable:true)
                 .Name("postcode")
                 .Description("Postcode of the learning provider");
+            
+            Field(x => x.OpenDate, nullable:true)
+                .Name("openDate")
+                .Description("Date the learning provider opened");
+            
+            Field(x => x.CloseDate, nullable:true)
+                .Name("closeDate")
+                .Description("Date the learning provider closed");
         }
     }
 }
