@@ -6,6 +6,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
+using Dfe.Spi.GraphQlApi.Domain.Enumerations;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
@@ -13,6 +14,7 @@ using Dfe.Spi.GraphQlApi.Functions;
 using Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.SearchApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi;
+using Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi;
 using GraphQL;
 using GraphQL.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -49,6 +51,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             AddSearch(services);
             AddRegistry(services);
             AddEntityRepository(services);
+            AddEnumerationRepository(services);
             AddResolvers(services);
             AddGraphQL(services);
         }
@@ -68,6 +71,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddSingleton(_configuration.Search);
             services.AddSingleton(_configuration.Registry);
             services.AddSingleton(_configuration.EntityRepository);
+            services.AddSingleton(_configuration.EnumerationRepository);
         }
 
         private void AddLogging(IServiceCollection services)
@@ -96,6 +100,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
                     services.AddScoped(parentResolverInterface, resolver);
                 }
             }
+
+            services.AddScoped<IEnumerationLoader, EnumerationLoader>();
         }
         
         private void AddGraphQL(IServiceCollection services)
@@ -107,6 +113,9 @@ namespace Dfe.Spi.GraphQlApi.Functions
             }));
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddScoped<LearningProviderStatusEnum>();
+            services.AddScoped<LearningProviderTypeEnum>();
+            services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderType>();
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
@@ -125,6 +134,11 @@ namespace Dfe.Spi.GraphQlApi.Functions
         private void AddEntityRepository(IServiceCollection services)
         {
             services.AddScoped<IEntityRepository, SquasherEntityRepository>();
+        }
+
+        private void AddEnumerationRepository(IServiceCollection services)
+        {
+            services.AddScoped<IEnumerationRepository, TranslatorApiEnumerationRepository>();
         }
     }
 }
