@@ -34,6 +34,34 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.CloseDate, nullable:true)
                 .Name("closeDate")
                 .Description("Date the learning provider closed");
+
+            Field<LearningProviderStatusEnum>(
+                name: "Status",
+                description: "Status of learning provider",
+                resolve: ResolveStatus);
+
+            Field<LearningProviderTypeEnum>(
+                name: "Type",
+                description: "Type of learning provider",
+                resolve: ResolveType);
+
+            Field<LearningProviderSubTypeEnum>(
+                name: "SubType",
+                description: "Sub-Type of learning provider",
+                resolve: ResolveSubType);
+        }
+
+        private object ResolveStatus(ResolveFieldContext<LearningProvider> ctx)
+        {
+            return ctx.Source.Status;
+        }
+        private object ResolveType(ResolveFieldContext<LearningProvider> ctx)
+        {
+            return ctx.Source.Type;
+        }
+        private object ResolveSubType(ResolveFieldContext<LearningProvider> ctx)
+        {
+            return ctx.Source.SubType;
         }
     }
 }

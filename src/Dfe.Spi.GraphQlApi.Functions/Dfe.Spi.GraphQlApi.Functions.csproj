@@ -27,5 +27,6 @@
       <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi\Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.csproj" />
       <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Infrastructure.SearchApi\Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.csproj" />
       <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi\Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.csproj" />
+      <ProjectReference Include="..\Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi\Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi.csproj" />
     </ItemGroup>
 </Project>
