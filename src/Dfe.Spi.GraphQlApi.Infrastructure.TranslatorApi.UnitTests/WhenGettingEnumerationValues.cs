@@ -59,7 +59,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi.UnitTests
 
             _restClientMock.Verify(c => c.ExecuteTaskAsync(It.Is<RestRequest>(r =>
                     r.Method == Method.GET &&
-                    r.Resource == enumName), _cancellationToken),
+                    r.Resource == $"enumerations/{enumName}"), _cancellationToken),
                 Times.Once);
         }
 
