@@ -34,7 +34,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi
 
         public async Task<string[]> GetEnumerationValuesAsync(string enumName, CancellationToken cancellationToken)
         {
-            var resource = enumName;
+            var resource = $"enumerations/{enumName}";
             _logger.Info($"Calling {resource} on translator api");
             var request = new RestRequest(resource, Method.GET);
             var response = await _restClient.ExecuteTaskAsync(request, cancellationToken);
