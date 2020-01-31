@@ -37,19 +37,25 @@
       "type": "string"
     },
     "searchFunctionKey": {
-      "type": "string"
+      "type": "securestring"
     },
     "registryApiUrl": {
       "type": "string"
     },
     "registryFunctionKey": {
-      "type": "string"
+      "type": "securestring"
     },
     "squasherApiUrl": {
       "type": "string"
     },
     "squasherFunctionKey": {
+      "type": "securestring"
+    },
+    "translatorApiUrl": {
       "type": "string"
+    },
+    "translatorFunctionKey": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -180,6 +186,14 @@
             {
               "name": "SPI_EntityRepository__SquasherApiFunctionKey",
               "value": "[parameters('squasherFunctionKey')]"
+            },
+            {
+              "name": "SPI_EnumerationRepository__TranslatorApiBaseUrl",
+              "value": "[parameters('translatorApiUrl')]"
+            },
+            {
+              "name": "SPI_EnumerationRepository__TranslatorApiFunctionKey",
+              "value": "[parameters('translatorFunctionKey')]"
             }
           ]
         }
