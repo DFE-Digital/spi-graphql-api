@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
@@ -30,13 +31,20 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
             HttpRequest req,
             CancellationToken cancellationToken)
         {
+            var startTime = DateTime.Now;
+            var internalRequestId = Guid.NewGuid();
+            var externalRequestId = req.Headers.ContainsKey("X-External-Request-Id")
+                ? req.Headers["X-External-Request-Id"].First()
+                : null;
+
             _logger.SetContext(req.Headers);
-            _logger.SetInternalRequestId(Guid.NewGuid());
+            _logger.SetInternalRequestId(internalRequestId);
 
             var graphRequest = await ExtractGraphRequestAsync(req);
             var result = await _spiSchema.ExecuteAsync(graphRequest);
-            
-            return new OkObjectResult(result);
+
+            var endTime = DateTime.Now;
+            return new AuditedOkObjectResult(result, startTime, endTime, internalRequestId, externalRequestId);
         }
 
 
@@ -59,6 +67,38 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
             }
 
             return null;
+        }
+    }
+
+    public class AuditedOkObjectResult : OkObjectResult
+    {
+        public DateTime StartTime { get; }
+        public DateTime EndTime { get; }
+        public Guid RequestId { get; }
+        public string ConsumerRequestId { get; }
+
+        public AuditedOkObjectResult(
+            object value, 
+            DateTime startTime, 
+            DateTime endTime, 
+            Guid requestId,
+            string consumerRequestId)
+            : base(value)
+        {
+            StartTime = startTime;
+            EndTime = endTime;
+            RequestId = requestId;
+            ConsumerRequestId = consumerRequestId;
+        }
+
+        public override void OnFormatting(ActionContext context)
+        {
+            base.OnFormatting(context);
+
+            context.HttpContext.Response.Headers.Add("X-SPI-Start-Time", StartTime.ToString("O"));
+            context.HttpContext.Response.Headers.Add("X-SPI-End-Time", EndTime.ToString("O"));
+            context.HttpContext.Response.Headers.Add("X-SPI-Request-Id", RequestId.ToString());
+            context.HttpContext.Response.Headers.Add("X-SPI-Consumer-Request-Id", ConsumerRequestId);
         }
     }
 }
