@@ -1,6 +1,9 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http.Server;
+using Dfe.Spi.Common.Http.Server.Definitions;
 using Dfe.Spi.Common.Logging;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
@@ -27,17 +30,18 @@ using Newtonsoft.Json.Serialization;
 using RestSharp;
 
 [assembly: FunctionsStartup(typeof(Startup))]
+
 namespace Dfe.Spi.GraphQlApi.Functions
 {
     public class Startup : FunctionsStartup
     {
         private IConfigurationRoot _rawConfiguration;
         private GraphApiConfiguration _configuration;
-        
+
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var services = builder.Services;
-            
+
             // Setup JSON serialization
             JsonConvert.DefaultSettings =
                 () => new JsonSerializerSettings()
@@ -80,6 +84,10 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped(typeof(ILogger<>), typeof(Logger<>));
             services.AddScoped<ILogger>(provider =>
                 provider.GetService<ILoggerFactory>().CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
+
+            services.AddScoped<IHttpSpiExecutionContextManager, HttpSpiExecutionContextManager>();
+            services.AddScoped<ISpiExecutionContextManager>((provider) =>
+                (ISpiExecutionContextManager) provider.GetService(typeof(IHttpSpiExecutionContextManager)));
             services.AddScoped<ILoggerWrapper, LoggerWrapper>();
         }
 
@@ -91,10 +99,12 @@ namespace Dfe.Spi.GraphQlApi.Functions
         private void AddResolvers(IServiceCollection services)
         {
             var resolverType = typeof(IResolver<>);
-            var resolvers = resolverType.Assembly.GetTypes().Where(t => t.GetInterface(resolverType.FullName) != null && t.IsClass);
+            var resolvers = resolverType.Assembly.GetTypes()
+                .Where(t => t.GetInterface(resolverType.FullName) != null && t.IsClass);
             foreach (var resolver in resolvers)
             {
-                var parentResolverInterfaces = resolver.GetInterfaces().Where(t => t.GetInterface(resolverType.FullName)!=null);
+                var parentResolverInterfaces =
+                    resolver.GetInterfaces().Where(t => t.GetInterface(resolverType.FullName) != null);
                 foreach (var parentResolverInterface in parentResolverInterfaces)
                 {
                     services.AddScoped(parentResolverInterface, resolver);
@@ -103,7 +113,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
 
             services.AddScoped<IEnumerationLoader, EnumerationLoader>();
         }
-        
+
         private void AddGraphQL(IServiceCollection services)
         {
             services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver((type) =>
