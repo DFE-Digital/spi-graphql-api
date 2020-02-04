@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http.Server.Definitions;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Domain.Graph;
@@ -18,11 +20,13 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
         private const string FunctionName = nameof(ProcessGraphQuery);
         private readonly SpiSchema _spiSchema;
         private readonly ILoggerWrapper _logger;
+        private readonly IHttpSpiExecutionContextManager _contextManager;
 
-        public ProcessGraphQuery(SpiSchema spiSchema, ILoggerWrapper logger)
+        public ProcessGraphQuery(SpiSchema spiSchema, ILoggerWrapper logger, IHttpSpiExecutionContextManager contextManager)
         {
             _spiSchema = spiSchema;
             _logger = logger;
+            _contextManager = contextManager;
         }
 
         [FunctionName(FunctionName)]
@@ -32,19 +36,20 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
             CancellationToken cancellationToken)
         {
             var startTime = DateTime.Now;
-            var internalRequestId = Guid.NewGuid();
-            var externalRequestId = req.Headers.ContainsKey("X-External-Request-Id")
-                ? req.Headers["X-External-Request-Id"].First()
-                : null;
 
-            _logger.SetContext(req.Headers);
-            _logger.SetInternalRequestId(internalRequestId);
+            _contextManager.SetContext(req.Headers);
+            _contextManager.SetInternalRequestId(Guid.NewGuid());
 
             var graphRequest = await ExtractGraphRequestAsync(req);
             var result = await _spiSchema.ExecuteAsync(graphRequest);
 
             var endTime = DateTime.Now;
-            return new AuditedOkObjectResult(result, startTime, endTime, internalRequestId, externalRequestId);
+            return new AuditedOkObjectResult(
+                result, 
+                startTime, 
+                endTime, 
+                _contextManager.SpiExecutionContext.InternalRequestId.Value, 
+                _contextManager.SpiExecutionContext.ExternalRequestId);
         }
 
 
