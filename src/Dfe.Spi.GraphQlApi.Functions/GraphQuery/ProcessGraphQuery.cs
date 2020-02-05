@@ -8,6 +8,7 @@ using Dfe.Spi.Common.Http.Server.Definitions;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Domain.Graph;
+using GraphQL.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -40,8 +41,16 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
             _contextManager.SetContext(req.Headers);
             _contextManager.SetInternalRequestId(Guid.NewGuid());
 
-            var graphRequest = await ExtractGraphRequestAsync(req);
-            var result = await _spiSchema.ExecuteAsync(graphRequest);
+            string result;
+            if (req.Method.Equals("GET") && req.Query.ContainsKey("schema"))
+            {
+                result = new SchemaPrinter(_spiSchema).Print();
+            }
+            else
+            {
+                var graphRequest = await ExtractGraphRequestAsync(req);
+                result = await _spiSchema.ExecuteAsync(graphRequest);
+            }
 
             var endTime = DateTime.Now;
             return new AuditedOkObjectResult(
