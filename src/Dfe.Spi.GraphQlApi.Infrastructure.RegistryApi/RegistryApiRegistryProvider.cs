@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.GraphQlApi.Domain.Common;
@@ -29,12 +30,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
             _restClient.BaseUrl = new Uri(configuration.RegistryApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.RegistryApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.RegistryApiFunctionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName, configuration.RegistryApiFunctionKey,
                     ParameterType.HttpHeader));
             }
             if (!string.IsNullOrEmpty(configuration.RegistryApiSubscriptionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.RegistryApiSubscriptionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.RegistryApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
 

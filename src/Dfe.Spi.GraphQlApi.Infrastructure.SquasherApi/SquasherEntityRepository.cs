@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
@@ -30,12 +31,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             _restClient.BaseUrl = new Uri(configuration.SquasherApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.SquasherApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SquasherApiFunctionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName, configuration.SquasherApiFunctionKey,
                     ParameterType.HttpHeader));
             }
             if (!string.IsNullOrEmpty(configuration.SquasherApiSubscriptionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.SquasherApiSubscriptionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.SquasherApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
 

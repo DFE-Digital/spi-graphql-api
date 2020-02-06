@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
@@ -32,12 +33,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi
             _restClient.BaseUrl = new Uri(configuration.TranslatorApiBaseUrl);
             if (!string.IsNullOrEmpty(configuration.TranslatorApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key",
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName,
                     configuration.TranslatorApiFunctionKey, ParameterType.HttpHeader));
             }
             if (!string.IsNullOrEmpty(configuration.TranslatorApiSubscriptionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.TranslatorApiSubscriptionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.TranslatorApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
         }

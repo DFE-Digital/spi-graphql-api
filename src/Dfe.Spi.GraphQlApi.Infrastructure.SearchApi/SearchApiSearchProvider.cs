@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Common;
@@ -30,12 +31,12 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
             _restClient.BaseUrl = new Uri(configuration.SearchApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.SearchApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SearchApiFunctionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName, configuration.SearchApiFunctionKey,
                     ParameterType.HttpHeader));
             }
             if (!string.IsNullOrEmpty(configuration.SearchApiSubscriptionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.SearchApiSubscriptionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.SearchApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
 
