@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Enumerations;
@@ -13,15 +15,18 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi
     {
         private readonly EnumerationRepositoryConfiguration _configuration;
         private readonly IRestClient _restClient;
+        private readonly ISpiExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
         public TranslatorApiEnumerationRepository(
             EnumerationRepositoryConfiguration configuration,
             IRestClient restClient,
+            ISpiExecutionContextManager executionContextManager,
             ILoggerWrapper logger)
         {
             _configuration = configuration;
             _restClient = restClient;
+            _executionContextManager = executionContextManager;
             _logger = logger;
 
             _restClient.BaseUrl = new Uri(configuration.TranslatorApiBaseUrl);
@@ -37,6 +42,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi
             var resource = $"enumerations/{enumName}";
             _logger.Info($"Calling {resource} on translator api");
             var request = new RestRequest(resource, Method.GET);
+            request.AppendContext(_executionContextManager.SpiExecutionContext);
+            
             var response = await _restClient.ExecuteTaskAsync(request, cancellationToken);
             if (!response.IsSuccessful)
             {

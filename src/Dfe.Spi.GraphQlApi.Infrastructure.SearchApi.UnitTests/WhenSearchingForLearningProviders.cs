@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Context.Models;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Search;
@@ -19,6 +21,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.UnitTests
     {
         private Mock<IRestClient> _restClientMock;
         private SearchConfiguration _configuration;
+        private Mock<ISpiExecutionContextManager> _executionContextManager;
         private Mock<ILoggerWrapper> _loggerMock;
         private SearchApiSearchProvider _provider;
         private CancellationToken _cancellationToken;
@@ -42,12 +45,17 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi.UnitTests
             {
                 SearchApiBaseUrl = "https://search.example.com/"
             };
+            
+            _executionContextManager = new Mock<ISpiExecutionContextManager>();
+            _executionContextManager.Setup(m => m.SpiExecutionContext)
+                .Returns(new SpiExecutionContext());
 
             _loggerMock = new Mock<ILoggerWrapper>();
 
             _provider = new SearchApiSearchProvider(
                 _restClientMock.Object,
                 _configuration,
+                _executionContextManager.Object,
                 _loggerMock.Object);
 
             _cancellationToken = new CancellationToken();
