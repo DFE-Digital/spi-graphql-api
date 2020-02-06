@@ -2,6 +2,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Context.Models;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
@@ -17,6 +19,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
     {
         private Mock<IRestClient> _restClientMock;
         private RegistryConfiguration _configuration;
+        private Mock<ISpiExecutionContextManager> _executionContextManager;
         private Mock<ILoggerWrapper> _loggerMock;
         private RegistryApiRegistryProvider _provider;
         private CancellationToken _cancellationToken;
@@ -40,12 +43,17 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
             {
                 RegistryApiBaseUrl = "https://search.example.com/",
             };
+            
+            _executionContextManager = new Mock<ISpiExecutionContextManager>();
+            _executionContextManager.Setup(m => m.SpiExecutionContext)
+                .Returns(new SpiExecutionContext());
 
             _loggerMock = new Mock<ILoggerWrapper>();
 
             _provider = new RegistryApiRegistryProvider(
                 _restClientMock.Object,
                 _configuration,
+                _executionContextManager.Object,
                 _loggerMock.Object);
 
             _cancellationToken = new CancellationToken();

@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
+using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
@@ -14,16 +17,26 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
     public class SquasherEntityRepository : IEntityRepository
     {
         private readonly IRestClient _restClient;
+        private readonly ISpiExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
-        public SquasherEntityRepository(IRestClient restClient, EntityRepositoryConfiguration configuration,
+        public SquasherEntityRepository(
+            IRestClient restClient, 
+            EntityRepositoryConfiguration configuration,
+            ISpiExecutionContextManager executionContextManager,
             ILoggerWrapper logger)
         {
             _restClient = restClient;
+            _executionContextManager = executionContextManager;
             _restClient.BaseUrl = new Uri(configuration.SquasherApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.SquasherApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SquasherApiFunctionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName, configuration.SquasherApiFunctionKey,
+                    ParameterType.HttpHeader));
+            }
+            if (!string.IsNullOrEmpty(configuration.SquasherApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.SquasherApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
 
@@ -55,6 +68,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
             var httpRequest = new RestRequest(resource, Method.POST, DataFormat.Json);
             httpRequest.AddParameter("", json, ParameterType.RequestBody);
+            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
 
             var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
             if (!response.IsSuccessful)

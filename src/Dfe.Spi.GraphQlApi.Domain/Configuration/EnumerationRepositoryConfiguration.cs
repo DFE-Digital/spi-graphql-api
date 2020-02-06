@@ -4,5 +4,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Configuration
     {
         public string TranslatorApiBaseUrl { get; set; }
         public string TranslatorApiFunctionKey { get; set; }
+        public string TranslatorApiSubscriptionKey { get; set; }
     }
 }

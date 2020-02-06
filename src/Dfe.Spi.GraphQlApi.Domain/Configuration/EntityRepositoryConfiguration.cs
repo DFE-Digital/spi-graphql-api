@@ -4,5 +4,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Configuration
     {
         public string SquasherApiBaseUrl { get; set; }
         public string SquasherApiFunctionKey { get; set; }
+        public string SquasherApiSubscriptionKey { get; set; }
     }
 }

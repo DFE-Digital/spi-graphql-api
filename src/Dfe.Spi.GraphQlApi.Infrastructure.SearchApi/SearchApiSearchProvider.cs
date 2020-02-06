@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.Common.Context.Definitions;
+using Dfe.Spi.Common.Http;
+using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
@@ -14,15 +17,26 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
     public class SearchApiSearchProvider : ISearchProvider
     {
         private readonly IRestClient _restClient;
+        private readonly ISpiExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
-        public SearchApiSearchProvider(IRestClient restClient, SearchConfiguration configuration, ILoggerWrapper logger)
+        public SearchApiSearchProvider(
+            IRestClient restClient, 
+            SearchConfiguration configuration, 
+            ISpiExecutionContextManager executionContextManager,
+            ILoggerWrapper logger)
         {
             _restClient = restClient;
+            _executionContextManager = executionContextManager;
             _restClient.BaseUrl = new Uri(configuration.SearchApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.SearchApiFunctionKey))
             {
-                _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SearchApiFunctionKey,
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.AzureFunctionKeyHeaderName, configuration.SearchApiFunctionKey,
+                    ParameterType.HttpHeader));
+            }
+            if (!string.IsNullOrEmpty(configuration.SearchApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter(CommonHeaderNames.EapimSubscriptionKeyHeaderName, configuration.SearchApiSubscriptionKey,
                     ParameterType.HttpHeader));
             }
 
@@ -41,6 +55,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
             _logger.Debug($"Search request going to {resource} is {json}");
             
             var httpRequest = new RestRequest(resource, Method.POST, DataFormat.Json);
+            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
             httpRequest.AddParameter("", json, ParameterType.RequestBody);
             
             var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
