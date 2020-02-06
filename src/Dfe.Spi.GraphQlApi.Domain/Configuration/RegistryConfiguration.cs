@@ -4,5 +4,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Configuration
     {
         public string RegistryApiBaseUrl { get; set; }
         public string RegistryApiFunctionKey { get; set; }
+        public string RegistryApiSubscriptionKey { get; set; }
     }
 }

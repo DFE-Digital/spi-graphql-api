@@ -35,6 +35,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi
                 _restClient.DefaultParameters.Add(new Parameter("x-functions-key",
                     configuration.TranslatorApiFunctionKey, ParameterType.HttpHeader));
             }
+            if (!string.IsNullOrEmpty(configuration.TranslatorApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.TranslatorApiSubscriptionKey,
+                    ParameterType.HttpHeader));
+            }
         }
 
         public async Task<string[]> GetEnumerationValuesAsync(string enumName, CancellationToken cancellationToken)

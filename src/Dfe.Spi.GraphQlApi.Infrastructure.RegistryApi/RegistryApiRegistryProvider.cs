@@ -32,6 +32,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
                 _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.RegistryApiFunctionKey,
                     ParameterType.HttpHeader));
             }
+            if (!string.IsNullOrEmpty(configuration.RegistryApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.RegistryApiSubscriptionKey,
+                    ParameterType.HttpHeader));
+            }
 
             _logger = logger;
         }

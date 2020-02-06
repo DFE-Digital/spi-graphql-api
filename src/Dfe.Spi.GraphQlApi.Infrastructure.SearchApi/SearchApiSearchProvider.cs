@@ -33,6 +33,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SearchApi
                 _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SearchApiFunctionKey,
                     ParameterType.HttpHeader));
             }
+            if (!string.IsNullOrEmpty(configuration.SearchApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.SearchApiSubscriptionKey,
+                    ParameterType.HttpHeader));
+            }
 
             _logger = logger;
         }

@@ -33,6 +33,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
                 _restClient.DefaultParameters.Add(new Parameter("x-functions-key", configuration.SquasherApiFunctionKey,
                     ParameterType.HttpHeader));
             }
+            if (!string.IsNullOrEmpty(configuration.SquasherApiSubscriptionKey))
+            {
+                _restClient.DefaultParameters.Add(new Parameter("Ocp-Apim-Subscription-Key", configuration.SquasherApiSubscriptionKey,
+                    ParameterType.HttpHeader));
+            }
 
             _logger = logger;
         }
