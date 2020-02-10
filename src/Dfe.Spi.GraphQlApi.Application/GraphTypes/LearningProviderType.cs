@@ -7,6 +7,8 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     {
         public LearningProviderType()
         {
+            Name = "LearningProvider";
+            
             Field(x => x.Name)
                 .Name("name")
                 .Description("Name of the learning provider");
@@ -34,6 +36,42 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.CloseDate, nullable:true)
                 .Name("closeDate")
                 .Description("Date the learning provider closed");
+            
+            
+            
+            Field(x => x.AcademyTrustCode, nullable:true)
+                .Name("academyTrustCode")
+                .Description("Academy trust code");
+            
+            Field(x => x.CharitiesCommissionNumber, nullable:true)
+                .Name("charitiesCommissionNumber")
+                .Description("Registered charity number");
+            
+            Field(x => x.CompaniesHouseNumber, nullable:true)
+                .Name("companiesHouseNumber")
+                .Description("Registered company number");
+            
+            Field(x => x.DfeNumber, nullable:true)
+                .Name("dfeNumber")
+                .Description("DfE Number");
+            
+            Field(x => x.LocalAuthority, nullable:true)
+                .Name("localAuthority")
+                .Description("Local authority");
+            
+            Field(x => x.EstablishmentNumber, nullable:true)
+                .Name("establishmentNumber")
+                .Description("Establishment number");
+            
+            Field(x => x.PreviousEstablishmentNumber, nullable:true)
+                .Name("previousEstablishmentNumber")
+                .Description("Previous establishment number");
+            
+            Field(x => x.Uprn, nullable:true)
+                .Name("uprn")
+                .Description("UPRN");
+            
+            
 
             Field<LearningProviderStatusEnum>(
                 name: "Status",

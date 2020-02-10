@@ -5,6 +5,6 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
     public interface IResolver<T>
     {
-        Task<T[]> ResolveAsync<TContext>(ResolveFieldContext<TContext> context);
+        Task<T> ResolveAsync<TContext>(ResolveFieldContext<TContext> context);
     }
 }

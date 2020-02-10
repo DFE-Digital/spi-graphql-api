@@ -99,5 +99,37 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
                     $"Expected item [{i}].SourceSystemId to be {synonyms[i]} but was {actual[i]}");
             }
         }
+
+        [Test, AutoData]
+        public async Task ThenItShouldReturnEmptyArrayIfNotFoundReturned(string entityType, string sourceSystem,
+            string sourceSystemId)
+        {
+            _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
+                .ReturnsAsync(new RestResponse
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    ResponseStatus = ResponseStatus.Completed,
+                });
+
+            var actual = await _provider.GetSynonymsAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken);
+
+            Assert.IsNotNull(actual);
+            Assert.IsEmpty(actual);
+        }
+
+        [Test, AutoData]
+        public void ThenItShouldThrowExceptionIfNonSuccessReturned(string entityType, string sourceSystem,
+            string sourceSystemId)
+        {
+            _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
+                .ReturnsAsync(new RestResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    ResponseStatus = ResponseStatus.Completed,
+                });
+
+            Assert.ThrowsAsync<RegistryApiException>(async () =>
+                await _provider.GetSynonymsAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken));
+        }
     }
 }

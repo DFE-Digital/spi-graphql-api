@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
@@ -53,6 +54,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
             var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
             if (!response.IsSuccessful)
             {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new EntityReference[0];
+                }
+                
                 throw new RegistryApiException(resource, response.StatusCode, response.Content);
             }
             _logger.Debug($"Synonyms response json from {resource} is ${response.Content}");
