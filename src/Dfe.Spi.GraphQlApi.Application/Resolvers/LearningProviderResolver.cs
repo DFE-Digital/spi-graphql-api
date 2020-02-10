@@ -58,6 +58,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             try
             {
                 var reference = await SearchAsync(context.Arguments, context.CancellationToken);
+                if (reference == null)
+                {
+                    return null;
+                }
 
                 var fields = GetRequestedFields(context);
                 var entities = await LoadAsync(reference, fields, context.CancellationToken);
@@ -86,9 +90,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     Field = kvp.Key,
                     Value = kvp.Value?.ToString(),
                 }).ToArray();
-            if (filters.Length == 0)
+            if (filters.Length != 1)
             {
-                throw new ResolverException("Must provide at least one argument");
+                throw new ResolverException("Must provide at one argument");
             }
 
             var references = await _entityReferenceBuilder.GetEntityReferences(new SearchRequest

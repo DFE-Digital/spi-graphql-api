@@ -39,7 +39,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder>();
             _entityReferenceBuilderMock.Setup(b =>
                     b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AggregateEntityReference[0]);
+                .ReturnsAsync(new[] {new AggregateEntityReference()});
 
             _resolver = new LearningProviderResolver(
                 _entityRepositoryMock.Object,
@@ -138,6 +138,19 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test]
+        public async Task ThenItShouldReturnNullIfNoEntityReferenceFound()
+        {
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new AggregateEntityReference[0]);
+            var context = BuildResolveFieldContext();
+
+            var actual = await _resolver.ResolveAsync(context);
+
+            Assert.IsNull(actual);
+        }
+
+        [Test]
         public void ThenItShouldThrowExceptionIfBuilderThrowsException()
         {
             var ex = new Exception("Unit test error");
@@ -152,15 +165,31 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test]
-        public async Task ThenItShouldSetErrorOnContextIfResolverExceptionThrown()
+        public async Task ThenItShouldSetErrorOnContextIfNoArgumentsProvided()
         {
-            var context =TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>());
+            var context = TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>());
 
             await _resolver.ResolveAsync(context);
-            
+
             Assert.IsNotNull(context.Errors);
             Assert.AreEqual(1, context.Errors.Count);
-            Assert.AreEqual("Must provide at least one argument", context.Errors[0].Message);
+            Assert.AreEqual("Must provide at one argument", context.Errors[0].Message);
+        }
+
+        [Test]
+        public async Task ThenItShouldSetErrorOnContextIfMoreThanOneArgumentsProvided()
+        {
+            var context = TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
+            {
+                {"urn", "12345678"},
+                {"dfeNumber", "123/4567"},
+            });
+
+            await _resolver.ResolveAsync(context);
+
+            Assert.IsNotNull(context.Errors);
+            Assert.AreEqual(1, context.Errors.Count);
+            Assert.AreEqual("Must provide at one argument", context.Errors[0].Message);
         }
 
         [Test]
