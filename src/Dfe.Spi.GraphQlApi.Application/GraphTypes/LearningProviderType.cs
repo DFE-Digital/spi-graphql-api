@@ -7,6 +7,8 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     {
         public LearningProviderType()
         {
+            Name = "LearningProvider";
+            
             Field(x => x.Name)
                 .Name("name")
                 .Description("Name of the learning provider");
