@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -7,6 +9,13 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests
 {
     public static class TestHelper
     {
+        private static readonly Random Rng = new Random();
+
+        public static int RandomInt(int min = 0, int max = int.MaxValue)
+        {
+            return Rng.Next(min, max);
+        }
+        
         public static ResolveFieldContext<T> BuildResolveFieldContext<T>(
             Dictionary<string, object> arguments = null,
             string[] fields = null)
@@ -19,6 +28,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests
                 {
                     SelectionSet = new SelectionSet(),
                 },
+                Errors = new ExecutionErrors(),
             };
 
             if (fields != null)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,23 +8,22 @@ using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models;
-using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
-    public interface ILearningProviderResolver : IResolver<LearningProvider>
+    public interface ILearningProvidersResolver : IResolver<LearningProvider[]>
     {
     }
 
-    public class LearningProviderResolver : ILearningProviderResolver
+    public class LearningProvidersResolver : ILearningProvidersResolver
     {
         private readonly IEntityRepository _entityRepository;
         private readonly ILoggerWrapper _logger;
         private readonly IEntityReferenceBuilder _entityReferenceBuilder;
 
-        internal LearningProviderResolver(
+        internal LearningProvidersResolver(
             IEntityRepository entityRepository,
             ILoggerWrapper logger,
             IEntityReferenceBuilder entityReferenceBuilder)
@@ -34,8 +32,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             _logger = logger;
             _entityReferenceBuilder = entityReferenceBuilder;
         }
-
-        public LearningProviderResolver(
+        public LearningProvidersResolver(
             ISearchProvider searchProvider,
             IEntityRepository entityRepository,
             IRegistryProvider registryProvider,
@@ -44,8 +41,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             _entityRepository = entityRepository;
             _logger = logger;
 
-            Task<EntityReference[]> GetSynonyms(string sourceSystem, string sourceId,
-                CancellationToken cancellationToken) =>
+            Task<EntityReference[]> GetSynonyms(string sourceSystem, string sourceId, CancellationToken cancellationToken) => 
                 registryProvider.GetSynonymsAsync("learning-providers", sourceSystem, sourceId, cancellationToken);
 
             _entityReferenceBuilder = new EntityReferenceBuilder<LearningProviderReference>(
@@ -53,67 +49,51 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 GetSynonyms);
         }
 
-        public async Task<LearningProvider> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
+        public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
         {
             try
             {
-                var reference = await SearchAsync(context.Arguments, context.CancellationToken);
+                var request = new SearchRequest
+                {
+                    Filter = new[]
+                    {
+                        new SearchFilter
+                        {
+                            Field = "Name",
+                            Value = (string) context.Arguments["name"],
+                        },
+                    }
+                };
+                var references = await _entityReferenceBuilder.GetEntityReferences(request, context.CancellationToken);
 
                 var fields = GetRequestedFields(context);
-                var entities = await LoadAsync(reference, fields, context.CancellationToken);
+                var entities = await LoadAsync(references, fields, context.CancellationToken);
 
                 return entities;
             }
-            catch (ResolverException ex)
-            {
-                _logger.Info($"Request issue resolving learning provider", ex);
-                context.Errors.Add(new ExecutionError(ex.Message));
-                return null;
-            }
             catch (Exception ex)
             {
-                _logger.Error($"Error resolving learning provider", ex);
+                _logger.Error($"Error resolving learning providers", ex);
                 throw;
             }
         }
 
-        private async Task<AggregateEntityReference> SearchAsync(Dictionary<string, object> arguments,
-            CancellationToken cancellationToken)
-        {
-            var filters = arguments
-                .Select(kvp => new SearchFilter
-                {
-                    Field = kvp.Key,
-                    Value = kvp.Value?.ToString(),
-                }).ToArray();
-            if (filters.Length == 0)
-            {
-                throw new ResolverException("Must provide at least one argument");
-            }
-
-            var references = await _entityReferenceBuilder.GetEntityReferences(new SearchRequest
-            {
-                Filter = filters,
-            }, cancellationToken);
-            return references.FirstOrDefault();
-        }
-
-        private async Task<LearningProvider> LoadAsync(AggregateEntityReference reference, string[] fields,
+        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references, string[] fields,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest
             {
-                EntityReferences = new[] {reference},
+                EntityReferences = references,
                 Fields = fields,
             };
             var loadResult = await _entityRepository.LoadLearningProvidersAsync(request, cancellationToken);
 
-            return loadResult.SquashedEntityResults.Select(x => x.SquashedEntity).SingleOrDefault();
+            return loadResult.SquashedEntityResults.Select(x => x.SquashedEntity).ToArray();
         }
 
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
         {
-            var selections = context.FieldAst.SelectionSet.Selections.Select(x => ((Field) x).Name);
+            var selections = context.FieldAst.SelectionSet.Selections.Select(x=>((Field)x).Name);
             return selections.ToArray();
         }
     }
