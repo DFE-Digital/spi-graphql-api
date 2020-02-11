@@ -92,7 +92,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 }).ToArray();
             if (filters.Length != 1)
             {
-                throw new ResolverException("Must provide at one argument");
+                throw new ResolverException("Must provide one argument");
             }
 
             var references = await _entityReferenceBuilder.GetEntityReferences(new SearchRequest
