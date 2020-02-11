@@ -173,7 +173,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             Assert.IsNotNull(context.Errors);
             Assert.AreEqual(1, context.Errors.Count);
-            Assert.AreEqual("Must provide at one argument", context.Errors[0].Message);
+            Assert.AreEqual("Must provide one argument", context.Errors[0].Message);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             Assert.IsNotNull(context.Errors);
             Assert.AreEqual(1, context.Errors.Count);
-            Assert.AreEqual("Must provide at one argument", context.Errors[0].Message);
+            Assert.AreEqual("Must provide one argument", context.Errors[0].Message);
         }
 
         [Test]
