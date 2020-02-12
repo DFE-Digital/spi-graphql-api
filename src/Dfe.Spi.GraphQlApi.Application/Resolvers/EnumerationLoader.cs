@@ -23,7 +23,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             var values = _enumerationRepository.GetEnumerationValuesAsync(enumName, default).Result;
             return values.Select(v => new EnumValueDefinition
             {
-                Name = v.Replace(" ", "").Replace("-", "to").Replace("'", ""),
+                Name = v.Replace(" ", "")
+                        .Replace("-", "to")
+                        .Replace("'", "")
+                        .Replace("(", "")
+                        .Replace(")", "")
+                        .Replace(",", "")
+                        .Replace(".", ""),
                 Description = v,
                 Value = v,
             }).ToArray();

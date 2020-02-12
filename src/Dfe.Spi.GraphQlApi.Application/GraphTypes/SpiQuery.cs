@@ -9,7 +9,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             ILearningProviderResolver learningProviderResolver,
             ILearningProvidersResolver learningProvidersResolver)
         {
-            Field<LearningProviderType>("learningProvider",
+            Field<LearningProvider>("learningProvider",
                 resolve: learningProviderResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
@@ -23,7 +23,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<IntGraphType> {Name = "previousEstablishmentNumber"},
                 }));
 
-            Field<ListGraphType<LearningProviderType>>("learningProviders",
+            Field<ListGraphType<LearningProvider>>("learningProviders",
                 resolve: learningProvidersResolver.ResolveAsync,
                 arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> {Name = "name"}));
