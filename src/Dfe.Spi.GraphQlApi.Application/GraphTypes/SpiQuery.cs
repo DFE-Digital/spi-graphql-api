@@ -25,8 +25,12 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 
             Field<ListGraphType<LearningProvider>>("learningProviders",
                 resolve: learningProvidersResolver.ResolveAsync,
-                arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> {Name = "name"}));
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<StringGraphType> {Name = "name"},
+                    new QueryArgument<StringGraphType> {Name = "type"},
+                    new QueryArgument<StringGraphType> {Name = "typeOperator", DefaultValue = "equals"},
+                }));
         }
     }
 }
