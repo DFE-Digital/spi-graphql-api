@@ -25,6 +25,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 Name = v.Replace(" ", "")
                         .Replace("-", "to")
+                        .Replace("/", "or")
+                        .Replace("⁄", "or")
+                        .Replace("\\", "or")
                         .Replace("'", "")
                         .Replace("(", "")
                         .Replace(")", "")
