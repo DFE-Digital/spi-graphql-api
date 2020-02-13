@@ -30,6 +30,14 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<StringGraphType> {Name = "name"},
                     new QueryArgument<StringGraphType> {Name = "type"},
                     new QueryArgument<StringGraphType> {Name = "typeOperator", DefaultValue = "equals"},
+                    new QueryArgument<StringGraphType> {Name = "subType"},
+                    new QueryArgument<StringGraphType> {Name = "subTypeOperator", DefaultValue = "equals"},
+                    new QueryArgument<StringGraphType> {Name = "status"},
+                    new QueryArgument<StringGraphType> {Name = "statusOperator", DefaultValue = "equals"},
+                    new QueryArgument<StringGraphType> {Name = "openDate"},
+                    new QueryArgument<StringGraphType> {Name = "openDateOperator", DefaultValue = "equals"},
+                    new QueryArgument<StringGraphType> {Name = "closeDate"},
+                    new QueryArgument<StringGraphType> {Name = "closeDateOperator", DefaultValue = "equals"},
                 }));
         }
     }

@@ -86,30 +86,25 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         private SearchRequest GetSearchRequest<T>(ResolveFieldContext<T> context)
         {
+            var fieldArgs = new[] {"name", "type", "subType", "status", "openDate", "closeDate"};
             var filters = new List<SearchFilter>();
 
-            if (context.Arguments.ContainsKey("name"))
+            foreach (var fieldArg in fieldArgs)
             {
-                filters.Add(new SearchFilter
+                if (context.Arguments.ContainsKey(fieldArg))
                 {
-                    Field = "Name",
-                    Value = (string)context.Arguments["name"],
-                });
+                    var filterOperator = context.Arguments.ContainsKey($"{fieldArg}Operator")
+                        ? (string) context.Arguments[$"{fieldArg}Operator"]
+                        : null;
+                    filters.Add(new SearchFilter
+                    {
+                        Field = $"{fieldArg[0].ToString().ToUpper()}{fieldArg.Substring(1)}",
+                        Value = (string) context.Arguments[fieldArg],
+                        Operator = filterOperator,
+                    });
+                }
             }
 
-            if (context.Arguments.ContainsKey("type"))
-            {
-                var filterOperator = context.Arguments.ContainsKey("typeOperator")
-                    ? (string)context.Arguments["typeOperator"]
-                    : null;
-                filters.Add(new SearchFilter
-                {
-                    Field = "Type",
-                    Value = (string)context.Arguments["type"],
-                    Operator = filterOperator,
-                });
-            }
-            
             return new SearchRequest {Filter = filters.ToArray()};
         }
 
