@@ -7,7 +7,7 @@
     <ItemGroup>
       <PackageReference Include="Dfe.Spi.Common.Logging" Version="1.1.0" />
       <PackageReference Include="Dfe.Spi.Common.WellKnownIdentifiers" Version="1.0.1" />
-      <PackageReference Include="Dfe.Spi.Models" Version="1.0.12" />
+      <PackageReference Include="Dfe.Spi.Models" Version="1.0.13" />
       <PackageReference Include="GraphQL" Version="2.4.0" />
     </ItemGroup>
 

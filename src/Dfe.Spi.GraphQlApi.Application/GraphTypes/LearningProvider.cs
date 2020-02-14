@@ -93,13 +93,13 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 description: "Gender Of Entry",
                 resolve: ctx => ctx.Source.GenderOfEntry);
 
-            Field(x => x.GorRegion, nullable: true)
-                .Name("gorRegion")
-                .Description("Gor Region");
+            Field(x => x.MiddleLayerSuperOutputArea, nullable: true)
+                .Name("middleLayerSuperOutputArea")
+                .Description("Middle Layer Super Output Area");
 
-            Field(x => x.GsslaCode, nullable: true)
-                .Name("gsslaCode")
-                .Description("Gssla Code");
+            Field(x => x.GovernmentStatisticalServiceLocalAuthorityCode, nullable: true)
+                .Name("governmentStatisticalServiceLocalAuthorityCode")
+                .Description("Government Statistical Service Local Authority Code");
 
             Field(x => x.Id, nullable: true)
                 .Name("id")
@@ -178,9 +178,9 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 .Name("previousLocalAuthorityName")
                 .Description("Previous Local Authority Name");
 
-            Field(x => x.RscRegion, nullable: true)
-                .Name("rscRegion")
-                .Description("Rsc Region");
+            Field(x => x.RegionalSchoolsCommissionerRegion, nullable: true)
+                .Name("regionalSchoolsCommissionerRegion")
+                .Description("Regional Schools Commissioner Region");
 
             Field(x => x.Section41Approved, nullable: true)
                 .Name("section41Approved")
@@ -191,22 +191,22 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 description: "Status",
                 resolve: ctx => ctx.Source.Status);
 
-            Field(x => x.StatutoryLowAge, nullable: true)
-                .Name("statutoryLowAge")
-                .Description("Statutory Low Age");
+            Field(x => x.LowestAge, nullable: true)
+                .Name("lowestAge")
+                .Description("Lowest Age");
 
-            Field(x => x.StatutoryHighAge, nullable: true)
-                .Name("statutoryHighAge")
-                .Description("Statutory High Age");
+            Field(x => x.HighestAge, nullable: true)
+                .Name("highestAge")
+                .Description("Highest Age");
 
             Field<LearningProviderSubTypeEnum>(
                 name: "SubType",
                 description: "SubType",
                 resolve: ctx => ctx.Source.SubType);
 
-            Field(x => x.SixthForm, nullable: true)
-                .Name("sixthForm")
-                .Description("Sixth Form");
+            Field(x => x.SixthFormStatus, nullable: true)
+                .Name("sixthFormStatus")
+                .Description("Sixth Form Status");
 
             Field(x => x.TeenMothers, nullable: true)
                 .Name("teenMothers")
@@ -249,82 +249,57 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 .Name("website")
                 .Description("Website");
 
-            // Field(x => x.Name)
-            //     .Name("name")
-            //     .Description("Name of the learning provider");
-            //
-            // Field(x => x.LegalName, nullable: true)
-            //     .Name("legalName")
-            //     .Description("Legal name of the learning provider");
-            //
-            // Field(x => x.Urn, nullable: true)
-            //     .Name("urn")
-            //     .Description("URN of the learning provider");
-            //
-            // Field(x => x.Ukprn, nullable: true)
-            //     .Name("ukprn")
-            //     .Description("UKPRN of the learning provider");
-            //
-            // Field(x => x.Postcode, nullable: true)
-            //     .Name("postcode")
-            //     .Description("Postcode of the learning provider");
-            //
-            // Field(x => x.OpenDate, nullable: true)
-            //     .Name("openDate")
-            //     .Description("Date the learning provider opened");
-            //
-            // Field(x => x.CloseDate, nullable: true)
-            //     .Name("closeDate")
-            //     .Description("Date the learning provider closed");
-            //
-            //
-            // Field(x => x.AcademyTrustCode, nullable: true)
-            //     .Name("academyTrustCode")
-            //     .Description("Academy trust code");
-            //
-            // Field(x => x.CharitiesCommissionNumber, nullable: true)
-            //     .Name("charitiesCommissionNumber")
-            //     .Description("Registered charity number");
-            //
-            // Field(x => x.CompaniesHouseNumber, nullable: true)
-            //     .Name("companiesHouseNumber")
-            //     .Description("Registered company number");
-            //
-            // Field(x => x.DfeNumber, nullable: true)
-            //     .Name("dfeNumber")
-            //     .Description("DfE Number");
-            //
-            // Field(x => x.LocalAuthorityCode, nullable: true)
-            //     .Name("localAuthority")
-            //     .Description("Local authority");
-            //
-            // Field(x => x.EstablishmentNumber, nullable: true)
-            //     .Name("establishmentNumber")
-            //     .Description("Establishment number");
-            //
-            // Field(x => x.PreviousEstablishmentNumber, nullable: true)
-            //     .Name("previousEstablishmentNumber")
-            //     .Description("Previous establishment number");
-            //
-            // Field(x => x.Uprn, nullable: true)
-            //     .Name("uprn")
-            //     .Description("UPRN");
-            //
-            //
-            // Field<LearningProviderStatusEnum>(
-            //     name: "Status",
-            //     description: "Status of learning provider",
-            //     resolve: ctx => ctx.Source.Status);
-            //
-            // Field<LearningProviderTypeEnum>(
-            //     name: "Type",
-            //     description: "Type of learning provider",
-            //     resolve: ctx => ctx.Source.Type);
-            //
-            // Field<LearningProviderSubTypeEnum>(
-            //     name: "SubType",
-            //     description: "Sub-Type of learning provider",
-            //     resolve: ctx => ctx.Source.SubType);
+            Field(x => x.TelephoneNumber, nullable: true)
+                .Name("telephoneNumber")
+                .Description("Telephone Number");
+
+            Field(x => x.ContactEmail, nullable: true)
+                .Name("contactEmail")
+                .Description("Contact Email");
+
+            Field(x => x.AddressLine1, nullable: true)
+                .Name("addressLine1")
+                .Description("Address Line 1");
+
+            Field(x => x.AddressLine2, nullable: true)
+                .Name("addressLine2")
+                .Description("Address Line 2");
+
+            Field(x => x.AddressLine3, nullable: true)
+                .Name("addressLine3")
+                .Description("Address Line 3");
+
+            Field(x => x.Town, nullable: true)
+                .Name("town")
+                .Description("Town");
+
+            Field(x => x.County, nullable: true)
+                .Name("county")
+                .Description("County");
+
+            Field(x => x.SchoolCapacity, nullable: true)
+                .Name("schoolCapacity")
+                .Description("School Capacity");
+
+            Field(x => x.NumberOfPupils, nullable: true)
+                .Name("numberOfPupils")
+                .Description("Number Of Pupils");
+
+            Field(x => x.NumberOfBoys, nullable: true)
+                .Name("numberOfBoys")
+                .Description("Number Of Boys");
+
+            Field(x => x.NumberOfGirls, nullable: true)
+                .Name("numberOfGirls")
+                .Description("Number Of Girls");
+
+            Field(x => x.ResourcedProvisionCapacity, nullable: true)
+                .Name("resourcedProvisionCapacity")
+                .Description("Resourced Provision Capacity");
+
+            Field(x => x.ResourcedProvisionNumberOnRoll, nullable: true)
+                .Name("resourcedProvisionNumberOnRoll")
+                .Description("Resourced Provision Number On Roll");
         }
     }
 }
