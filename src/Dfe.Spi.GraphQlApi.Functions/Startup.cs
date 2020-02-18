@@ -123,6 +123,13 @@ namespace Dfe.Spi.GraphQlApi.Functions
             }));
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            
+            
+            services.AddScoped<ComplexQueryCondition>();
+            services.AddScoped<ComplexQueryGroup>();
+            services.AddScoped<ComplexQuery>();
+            
+            
             services.AddScoped<BoardersCodeEnum>();
             services.AddScoped<LearningProviderGenderOfEntryEnum>();
             services.AddScoped<LocalAuthorityCodeEnum>();

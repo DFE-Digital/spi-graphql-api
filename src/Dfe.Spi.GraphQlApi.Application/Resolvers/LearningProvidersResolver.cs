@@ -4,13 +4,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using LearningProvider = Dfe.Spi.Models.LearningProvider;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
@@ -86,25 +88,35 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         private SearchRequest GetSearchRequest<T>(ResolveFieldContext<T> context)
         {
-            var fieldArgs = new[] {"name", "type", "subType", "status", "openDate", "closeDate"};
-            var filters = new List<SearchFilter>();
+            var criteria = (ComplexQueryModel) context.GetArgument(typeof(ComplexQueryModel), "criteria");
+            var firstGroup = criteria.Groups.First();
 
-            foreach (var fieldArg in fieldArgs)
+            var filters = firstGroup.Conditions.Select(c => new SearchFilter
             {
-                if (context.Arguments.ContainsKey(fieldArg))
-                {
-                    var filterOperator = context.Arguments.ContainsKey($"{fieldArg}Operator")
-                        ? (string) context.Arguments[$"{fieldArg}Operator"]
-                        : null;
-                    filters.Add(new SearchFilter
-                    {
-                        Field = $"{fieldArg[0].ToString().ToUpper()}{fieldArg.Substring(1)}",
-                        Value = (string) context.Arguments[fieldArg],
-                        Operator = filterOperator,
-                    });
-                }
-            }
+                Field = c.Field,
+                Operator = c.Operator,
+                Value = c.Value,
+            });
 
+            // var fieldArgs = new[] {"name", "type", "subType", "status", "openDate", "closeDate"};
+            // var filters = new List<SearchFilter>();
+            //
+            // foreach (var fieldArg in fieldArgs)
+            // {
+            //     if (context.Arguments.ContainsKey(fieldArg))
+            //     {
+            //         var filterOperator = context.Arguments.ContainsKey($"{fieldArg}Operator")
+            //             ? (string) context.Arguments[$"{fieldArg}Operator"]
+            //             : null;
+            //         filters.Add(new SearchFilter
+            //         {
+            //             Field = $"{fieldArg[0].ToString().ToUpper()}{fieldArg.Substring(1)}",
+            //             Value = (string) context.Arguments[fieldArg],
+            //             Operator = filterOperator,
+            //         });
+            //     }
+            // }
+            //
             return new SearchRequest {Filter = filters.ToArray()};
         }
 
