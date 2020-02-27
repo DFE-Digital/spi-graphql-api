@@ -8,7 +8,7 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -64,9 +64,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 }
 
                 var fields = GetRequestedFields(context);
-                var entities = await LoadAsync(reference, fields, context.CancellationToken);
+                var entity = await LoadAsync(reference, fields, context.CancellationToken);
 
-                return entities;
+                return entity;
             }
             catch (ResolverException ex)
             {

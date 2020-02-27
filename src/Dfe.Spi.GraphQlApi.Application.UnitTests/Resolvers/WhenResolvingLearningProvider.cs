@@ -8,7 +8,7 @@ using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 using Moq;
 using NUnit.Framework;

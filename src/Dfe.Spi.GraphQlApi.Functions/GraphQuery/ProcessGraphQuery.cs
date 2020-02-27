@@ -57,7 +57,7 @@ namespace Dfe.Spi.GraphQlApi.Functions.GraphQuery
                 result, 
                 startTime, 
                 endTime, 
-                _contextManager.SpiExecutionContext.InternalRequestId.Value, 
+                _contextManager.SpiExecutionContext.InternalRequestId.Value,
                 _contextManager.SpiExecutionContext.ExternalRequestId);
         }
 

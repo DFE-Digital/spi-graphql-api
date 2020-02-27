@@ -8,7 +8,7 @@ using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using Newtonsoft.Json;
 using RestSharp;
 

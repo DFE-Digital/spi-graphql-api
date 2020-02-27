@@ -1,9 +1,8 @@
-using Dfe.Spi.Models;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class LearningProvider : ObjectGraphType<Models.LearningProvider>
+    public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
         public LearningProvider()
         {
@@ -257,25 +256,25 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 .Name("contactEmail")
                 .Description("Contact Email");
 
-            Field(x => x.AddressLine1, nullable: true)
-                .Name("addressLine1")
-                .Description("Address Line 1");
-
-            Field(x => x.AddressLine2, nullable: true)
-                .Name("addressLine2")
-                .Description("Address Line 2");
-
-            Field(x => x.AddressLine3, nullable: true)
-                .Name("addressLine3")
-                .Description("Address Line 3");
-
-            Field(x => x.Town, nullable: true)
-                .Name("town")
-                .Description("Town");
-
-            Field(x => x.County, nullable: true)
-                .Name("county")
-                .Description("County");
+            // Field(x => x.AddressLine1, nullable: true)
+            //     .Name("addressLine1")
+            //     .Description("Address Line 1");
+            //
+            // Field(x => x.AddressLine2, nullable: true)
+            //     .Name("addressLine2")
+            //     .Description("Address Line 2");
+            //
+            // Field(x => x.AddressLine3, nullable: true)
+            //     .Name("addressLine3")
+            //     .Description("Address Line 3");
+            //
+            // Field(x => x.Town, nullable: true)
+            //     .Name("town")
+            //     .Description("Town");
+            //
+            // Field(x => x.County, nullable: true)
+            //     .Name("county")
+            //     .Description("County");
 
             Field(x => x.SchoolCapacity, nullable: true)
                 .Name("schoolCapacity")

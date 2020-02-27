@@ -8,7 +8,7 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 

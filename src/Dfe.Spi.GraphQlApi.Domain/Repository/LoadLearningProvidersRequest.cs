@@ -1,5 +1,5 @@
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Repository
 {
