@@ -7,5 +7,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Repository
     public interface IEntityRepository
     {
         Task<EntityCollection<LearningProvider>> LoadLearningProvidersAsync(LoadLearningProvidersRequest request, CancellationToken cancellationToken);
+        Task<EntityCollection<ManagementGroup>> LoadManagementGroupsAsync(LoadManagementGroupsRequest request, CancellationToken cancellationToken);
     }
 }
