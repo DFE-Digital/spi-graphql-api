@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -8,7 +9,7 @@ using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 using Moq;
 using NUnit.Framework;
@@ -107,6 +108,31 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         r.Fields[0] == "urn" &&
                         r.Fields[1] == "ukprn" &&
                         r.Fields[2] == "name"),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task ThenItShouldAlwaysUseUrnAndUkprnInFieldsWhenGettingReferencedEntities(
+            AggregateEntityReference reference)
+        {
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] {reference});
+            var context = BuildResolveFieldContext(fields: new[]
+            {
+                "name"
+            });
+
+            await _resolver.ResolveAsync(context);
+
+            _entityRepositoryMock.Verify(er => er.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(r =>
+                        r.Fields != null &&
+                        r.Fields.Length == 3 &&
+                        r.Fields.Contains("urn") &&
+                        r.Fields.Contains("ukprn") &&
+                        r.Fields.Contains("name")),
                     context.CancellationToken),
                 Times.Once);
         }

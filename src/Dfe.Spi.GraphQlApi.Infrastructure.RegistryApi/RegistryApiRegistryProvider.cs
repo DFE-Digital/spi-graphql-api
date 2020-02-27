@@ -68,5 +68,31 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
 
             return results.Synonyms;
         }
+        public async Task<EntityLinkReference[]> GetLinksAsync(string entityType, string sourceSystem, string sourceSystemId,
+            CancellationToken cancellationToken)
+        {
+            var resource = $"{entityType}/{sourceSystem}/{sourceSystemId}/links";
+            _logger.Debug($"Looking up links at {resource}");
+            
+            var httpRequest = new RestRequest(resource, Method.GET);
+            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
+            
+            var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new EntityLinkReference[0];
+                }
+                
+                throw new RegistryApiException(resource, response.StatusCode, response.Content);
+            }
+            _logger.Debug($"Links response json from {resource} is ${response.Content}");
+
+            var results = JsonConvert.DeserializeObject<GetLinksResult>(response.Content);
+            _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(results)}");
+
+            return results.Links;
+        }
     }
 }

@@ -1,11 +1,12 @@
-using Dfe.Spi.Models;
+using Dfe.Spi.GraphQlApi.Application.Resolvers;
+using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class LearningProvider : ObjectGraphType<Models.LearningProvider>
+    public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
-        public LearningProvider()
+        public LearningProvider(IManagementGroupProvider managementGroupProvider)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -257,25 +258,25 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 .Name("contactEmail")
                 .Description("Contact Email");
 
-            Field(x => x.AddressLine1, nullable: true)
-                .Name("addressLine1")
-                .Description("Address Line 1");
-
-            Field(x => x.AddressLine2, nullable: true)
-                .Name("addressLine2")
-                .Description("Address Line 2");
-
-            Field(x => x.AddressLine3, nullable: true)
-                .Name("addressLine3")
-                .Description("Address Line 3");
-
-            Field(x => x.Town, nullable: true)
-                .Name("town")
-                .Description("Town");
-
-            Field(x => x.County, nullable: true)
-                .Name("county")
-                .Description("County");
+            // Field(x => x.AddressLine1, nullable: true)
+            //     .Name("addressLine1")
+            //     .Description("Address Line 1");
+            //
+            // Field(x => x.AddressLine2, nullable: true)
+            //     .Name("addressLine2")
+            //     .Description("Address Line 2");
+            //
+            // Field(x => x.AddressLine3, nullable: true)
+            //     .Name("addressLine3")
+            //     .Description("Address Line 3");
+            //
+            // Field(x => x.Town, nullable: true)
+            //     .Name("town")
+            //     .Description("Town");
+            //
+            // Field(x => x.County, nullable: true)
+            //     .Name("county")
+            //     .Description("County");
 
             Field(x => x.SchoolCapacity, nullable: true)
                 .Name("schoolCapacity")
@@ -300,6 +301,9 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.ResourcedProvisionNumberOnRoll, nullable: true)
                 .Name("resourcedProvisionNumberOnRoll")
                 .Description("Resourced Provision Number On Roll");
+            
+            Field<ManagementGroup>("managementGroup",
+                resolve: managementGroupProvider.ResolveAsync);
         }
     }
 }

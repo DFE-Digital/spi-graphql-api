@@ -9,6 +9,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -46,6 +47,17 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
         public async Task<EntityCollection<LearningProvider>> LoadLearningProvidersAsync(
             LoadLearningProvidersRequest request, CancellationToken cancellationToken)
         {
+            return await LoadAsync<LearningProvider>(request, cancellationToken);
+        }
+
+        public async Task<EntityCollection<ManagementGroup>> LoadManagementGroupsAsync(LoadManagementGroupsRequest request, CancellationToken cancellationToken)
+        {
+            return await LoadAsync<ManagementGroup>(request, cancellationToken);
+        }
+
+
+        private async Task<EntityCollection<T>> LoadAsync<T>(LoadEntitiesRequest request, CancellationToken cancellationToken) where T : ModelsBase
+        {
             const string resource = "get-squashed-entity";
 
             var squasherRequest = new GetSquashedEntitiesRequest
@@ -78,7 +90,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
             _logger.Debug($"Search response json from {resource} is ${response.Content}");
 
-            var results = JsonConvert.DeserializeObject<EntityCollection<LearningProvider>>(response.Content);
+            var results = JsonConvert.DeserializeObject<EntityCollection<T>>(response.Content);
             _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(results)}");
 
             return results;

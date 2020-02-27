@@ -11,7 +11,6 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models.Entities;
 using Moq;
 using Newtonsoft.Json;
@@ -20,7 +19,7 @@ using RestSharp;
 
 namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
 {
-    public class WhenLoadingLearningProviders
+    public class WhenLoadingManagementGroups
     {
         private Mock<IRestClient> _restClientMock;
         private EntityRepositoryConfiguration _configuration;
@@ -36,9 +35,9 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
             _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
                 .ReturnsAsync(new RestResponse
                 {
-                    Content = JsonConvert.SerializeObject(new EntityCollection<LearningProvider>
+                    Content = JsonConvert.SerializeObject(new EntityCollection<ManagementGroup>
                     {
-                        SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
+                        SquashedEntityResults = new SquashedEntityResult<ManagementGroup>[0],
                     }),
                     StatusCode = HttpStatusCode.OK,
                     ResponseStatus = ResponseStatus.Completed,
@@ -65,9 +64,9 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldPostSearchRequestToLearningProvidersEndpoint(LoadLearningProvidersRequest request)
+        public async Task ThenItShouldPostSearchRequestToManagementGroupsEndpoint(LoadManagementGroupsRequest request)
         {
-            await _repository.LoadLearningProvidersAsync(request, _cancellationToken);
+            await _repository.LoadManagementGroupsAsync(request, _cancellationToken);
 
             var expectedTranslatedRequest = new GetSquashedEntitiesRequest
             {
@@ -96,8 +95,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
         }
 
         [Test, NonRecursiveAutoData]
-        public async Task ThenItShouldReturnDeserializedResponseFromApi(LoadLearningProvidersRequest request,
-            EntityCollection<LearningProvider> results)
+        public async Task ThenItShouldReturnDeserializedResponseFromApi(LoadManagementGroupsRequest request,
+            EntityCollection<ManagementGroup> results)
         {
             _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
                 .ReturnsAsync(new RestResponse
@@ -107,7 +106,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                     ResponseStatus = ResponseStatus.Completed,
                 });
 
-            var actual = await _repository.LoadLearningProvidersAsync(request, _cancellationToken);
+            var actual = await _repository.LoadManagementGroupsAsync(request, _cancellationToken);
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(results.SquashedEntityResults.Length, actual.SquashedEntityResults.Length);
@@ -118,14 +117,14 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
 
                 Assert.AreEqual(expectedEntity.Name, actualEntity.Name,
                     $"Expected entity {i} to have Name {expectedEntity.Name} but was {actualEntity.Name}");
-                Assert.AreEqual(expectedEntity.LegalName, actualEntity.LegalName,
-                    $"Expected entity {i} to have LegalName {expectedEntity.LegalName} but was {actualEntity.LegalName}");
-                Assert.AreEqual(expectedEntity.Urn, actualEntity.Urn,
-                    $"Expected entity {i} to have Urn {expectedEntity.Urn} but was {actualEntity.Urn}");
-                Assert.AreEqual(expectedEntity.Ukprn, actualEntity.Ukprn,
-                    $"Expected entity {i} to have Ukprn {expectedEntity.Ukprn} but was {actualEntity.Ukprn}");
-                Assert.AreEqual(expectedEntity.Postcode, actualEntity.Postcode,
-                    $"Expected entity {i} to have Postcode {expectedEntity.Postcode} but was {actualEntity.Postcode}");
+                Assert.AreEqual(expectedEntity.Type, actualEntity.Type,
+                    $"Expected entity {i} to have Type {expectedEntity.Type} but was {actualEntity.Type}");
+                Assert.AreEqual(expectedEntity.Identifier, actualEntity.Identifier,
+                    $"Expected entity {i} to have Identifier {expectedEntity.Identifier} but was {actualEntity.Identifier}");
+                Assert.AreEqual(expectedEntity.Code, actualEntity.Code,
+                    $"Expected entity {i} to have Code {expectedEntity.Code} but was {actualEntity.Code}");
+                Assert.AreEqual(expectedEntity.CompaniesHouseNumber, actualEntity.CompaniesHouseNumber,
+                    $"Expected entity {i} to have CompaniesHouseNumber {expectedEntity.CompaniesHouseNumber} but was {actualEntity.CompaniesHouseNumber}");
             }
         }
 
@@ -141,7 +140,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                 });
 
             var actual = Assert.ThrowsAsync<SquasherApiException>(async () =>
-                await _repository.LoadLearningProvidersAsync(new LoadLearningProvidersRequest(), _cancellationToken));
+                await _repository.LoadManagementGroupsAsync(new LoadManagementGroupsRequest(), _cancellationToken));
             Assert.AreEqual("get-squashed-entity", actual.Resource);
             Assert.AreEqual(HttpStatusCode.BadRequest, actual.Status);
             Assert.AreEqual("Some-details-here", actual.Details);

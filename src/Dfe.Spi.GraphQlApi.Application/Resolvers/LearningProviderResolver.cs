@@ -8,7 +8,7 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
-using Dfe.Spi.Models;
+using Dfe.Spi.Models.Entities;
 using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -62,11 +62,12 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 {
                     return null;
                 }
+                _logger.Info($"Found reference {reference}");
 
                 var fields = GetRequestedFields(context);
-                var entities = await LoadAsync(reference, fields, context.CancellationToken);
+                var entity = await LoadAsync(reference, fields, context.CancellationToken);
 
-                return entities;
+                return entity;
             }
             catch (ResolverException ex)
             {
@@ -89,15 +90,15 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 {
                     Field = kvp.Key,
                     Value = kvp.Value?.ToString(),
-                }).ToArray();
-            if (filters.Length != 1)
+                }).ToList();
+            if (filters.Count != 1)
             {
                 throw new ResolverException("Must provide one argument");
             }
 
             var references = await _entityReferenceBuilder.GetEntityReferences(new SearchRequest
             {
-                Filter = filters,
+                Filter = filters.ToArray(),
             }, cancellationToken);
             return references.FirstOrDefault();
         }
@@ -118,6 +119,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
         {
             var selections = context.FieldAst.SelectionSet.Selections.Select(x => ((Field) x).Name);
+            
+            // Will need identifiers for resolving sub objects (such as management group), so request them from backend
+            selections = selections.Concat(new[] {"urn", "ukprn"}).Distinct();
+            
             return selections.ToArray();
         }
     }
