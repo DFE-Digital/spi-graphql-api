@@ -94,6 +94,28 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             _entityReferenceBuilderMock.Setup(b =>
                     b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(entityReferences);
+            var fields = new[] {"name", "urn", "ukprn"};
+            var context = BuildResolveFieldContext(fields: fields);
+            
+            await _resolver.ResolveAsync(context);
+            
+            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
+                It.Is<LoadLearningProvidersRequest>(req=>
+                    req.Fields != null &&
+                    req.Fields.Length == 3 &&
+                    req.Fields.Contains("urn") &&
+                    req.Fields.Contains("ukprn") &&
+                    req.Fields.Contains("name")),
+                context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task ThenItShouldAlwaysUseUrnAndUkprnInFieldsWhenGettingReferencedEntities(AggregateEntityReference[] entityReferences)
+        {
+            _entityReferenceBuilderMock.Setup(b =>
+                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(entityReferences);
             var fields = new[] {"name", "postcode"};
             var context = BuildResolveFieldContext(fields: fields);
             
@@ -102,9 +124,11 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
                 It.Is<LoadLearningProvidersRequest>(req=>
                     req.Fields != null &&
-                    req.Fields.Length == 2 &&
-                    req.Fields[0] == fields[0] &&
-                    req.Fields[1] == fields[1]),
+                    req.Fields.Length == 4 &&
+                    req.Fields.Contains("urn") &&
+                    req.Fields.Contains("ukprn") &&
+                    req.Fields.Contains("name") &&
+                    req.Fields.Contains("postcode")),
                 context.CancellationToken),
                 Times.Once);
         }

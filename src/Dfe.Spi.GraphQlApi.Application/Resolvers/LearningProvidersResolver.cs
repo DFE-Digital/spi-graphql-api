@@ -111,6 +111,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
         {
             var selections = context.FieldAst.SelectionSet.Selections.Select(x => ((Field) x).Name);
+            
+            // Will need identifiers for resolving sub objects (such as management group), so request them from backend
+            selections = selections.Concat(new[] {"urn", "ukprn"}).Distinct();
+
             return selections.ToArray();
         }
     }
