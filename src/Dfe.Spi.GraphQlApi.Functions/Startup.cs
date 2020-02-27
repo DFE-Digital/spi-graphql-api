@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http.Server;
 using Dfe.Spi.Common.Http.Server.Definitions;
@@ -123,13 +122,16 @@ namespace Dfe.Spi.GraphQlApi.Functions
             }));
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            
             services.AddScoped<BoardersCodeEnum>();
             services.AddScoped<LearningProviderGenderOfEntryEnum>();
             services.AddScoped<LocalAuthorityCodeEnum>();
             services.AddScoped<LearningProviderStatusEnum>();
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
-            services.AddScoped<LearningProvider>();
+            
+            services.AddScoped<Application.GraphTypes.ManagementGroup>();
+            services.AddScoped<Application.GraphTypes.LearningProvider>();
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
         }

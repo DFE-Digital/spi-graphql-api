@@ -1,10 +1,12 @@
+using Dfe.Spi.GraphQlApi.Application.Resolvers;
+using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
     public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
-        public LearningProvider()
+        public LearningProvider(IManagementGroupProvider managementGroupProvider)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -299,6 +301,9 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.ResourcedProvisionNumberOnRoll, nullable: true)
                 .Name("resourcedProvisionNumberOnRoll")
                 .Description("Resourced Provision Number On Roll");
+            
+            Field<ManagementGroup>("managementGroup",
+                resolve: managementGroupProvider.ResolveAsync);
         }
     }
 }
