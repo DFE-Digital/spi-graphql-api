@@ -36,17 +36,11 @@
     "searchApiUrl": {
       "type": "string"
     },
-    "searchFunctionKey": {
-      "type": "securestring"
-    },
     "searchSubscriptionKey": {
       "type": "securestring"
     },
     "registryApiUrl": {
       "type": "string"
-    },
-    "registryFunctionKey": {
-      "type": "securestring"
     },
     "registrySubscriptionKey": {
       "type": "securestring"
@@ -54,17 +48,11 @@
     "squasherApiUrl": {
       "type": "string"
     },
-    "squasherFunctionKey": {
-      "type": "securestring"
-    },
     "squasherSubscriptionKey": {
       "type": "securestring"
     },
     "translatorApiUrl": {
       "type": "string"
-    },
-    "translatorFunctionKey": {
-      "type": "securestring"
     },
     "translatorSubscriptionKey": {
       "type": "securestring"
@@ -185,20 +173,12 @@
               "value": "[parameters('searchApiUrl')]"
             },
             {
-              "name": "SPI_Search__SearchApiFunctionKey",
-              "value": "[parameters('searchFunctionKey')]"
-            },
-            {
               "name": "SPI_Search__SearchApiSubscriptionKey",
               "value": "[parameters('searchSubscriptionKey')]"
             },
             {
               "name": "SPI_Registry__RegistryApiBaseUrl",
               "value": "[parameters('registryApiUrl')]"
-            },
-            {
-              "name": "SPI_Registry__RegistryApiFunctionKey",
-              "value": "[parameters('registryFunctionKey')]"
             },
             {
               "name": "SPI_Registry__RegistryApiSubscriptionKey",
@@ -209,20 +189,12 @@
               "value": "[parameters('squasherApiUrl')]"
             },
             {
-              "name": "SPI_EntityRepository__SquasherApiFunctionKey",
-              "value": "[parameters('squasherFunctionKey')]"
-            },
-            {
               "name": "SPI_EntityRepository__SquasherApiSubscriptionKey",
               "value": "[parameters('squasherSubscriptionKey')]"
             },
             {
               "name": "SPI_EnumerationRepository__TranslatorApiBaseUrl",
               "value": "[parameters('translatorApiUrl')]"
-            },
-            {
-              "name": "SPI_EnumerationRepository__TranslatorApiFunctionKey",
-              "value": "[parameters('translatorFunctionKey')]"
             },
             {
               "name": "SPI_EnumerationRepository__TranslatorApiSubscriptionKey",
