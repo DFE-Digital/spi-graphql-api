@@ -162,9 +162,32 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
         private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null)
         {
+            var groups = new List<object>
+            {
+                new Dictionary<string, object>
+                {
+                    {"isAnd", true},
+                    {
+                        "conditions", new List<object>
+                        {
+                            new Dictionary<string, object>
+                            {
+                                {"field", "Name"},
+                                {"operator", "equals"},
+                                {"value", name ?? Guid.NewGuid().ToString()},
+                            }
+                        }
+                    },
+                }
+            };
+            var criteria = new Dictionary<string, object>
+            {
+                { "isAnd", true },
+                { "groups", groups }
+            };
             return TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
             {
-                {"name", name ?? Guid.NewGuid().ToString()},
+                {"criteria", criteria},
             }, fields: fields);
         }
 
