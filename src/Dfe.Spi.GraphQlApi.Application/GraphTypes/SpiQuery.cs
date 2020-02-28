@@ -19,8 +19,6 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<StringGraphType> {Name = "companiesHouseNumber"},
                     new QueryArgument<StringGraphType> {Name = "charitiesCommissionNumber"},
                     new QueryArgument<StringGraphType> {Name = "dfeNumber"},
-                    new QueryArgument<IntGraphType> {Name = "establishmentNumber"},
-                    new QueryArgument<IntGraphType> {Name = "previousEstablishmentNumber"},
                 }));
 
             Field<ListGraphType<LearningProvider>>("learningProviders",
