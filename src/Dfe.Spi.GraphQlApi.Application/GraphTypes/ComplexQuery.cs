@@ -5,7 +5,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     public class ComplexQueryModel
     {
         public ComplexQueryGroupModel[] Groups { get; set; }
-        public bool IsAnd { get; set; }
+        public bool IsOr { get; set; }
     }
 
     public class ComplexQuery : InputObjectGraphType<ComplexQueryModel>
@@ -17,10 +17,9 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 description: "groups of query",
                 resolve: ctx => ctx.Source.Groups);
 
-            Field(x => x.IsAnd)
-                .Name("isAnd")
-                .Description("Whether to treat groups as and")
-                .DefaultValue(true);
+            Field(x => x.IsOr, nullable: true)
+                .Name("isOr")
+                .Description("Whether to treat groups as or");
         }
     }
 }

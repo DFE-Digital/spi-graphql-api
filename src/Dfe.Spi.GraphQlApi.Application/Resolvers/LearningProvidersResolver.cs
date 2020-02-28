@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,16 +88,29 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private SearchRequest GetSearchRequest<T>(ResolveFieldContext<T> context)
         {
             var criteria = (ComplexQueryModel) context.GetArgument(typeof(ComplexQueryModel), "criteria");
-            var firstGroup = criteria.Groups.First();
 
-            var filters = firstGroup.Conditions.Select(c => new SearchFilter
+            var searchGroups = new List<SearchGroup>();
+            foreach (var @group in criteria.Groups)
             {
-                Field = c.Field,
-                Operator = c.Operator,
-                Value = c.Value,
-            });
+                var filters = @group.Conditions.Select(c => new SearchFilter
+                {
+                    Field = c.Field,
+                    Operator = c.Operator,
+                    Value = c.Value,
+                }).ToArray();
+                
+                searchGroups.Add(new SearchGroup
+                {
+                    Filter = filters,
+                    CombinationOperator = group.IsOr ? "or" : "and",
+                });
+            }
 
-            return new SearchRequest {Filter = filters.ToArray()};
+            return new SearchRequest
+            {
+                Groups = searchGroups.ToArray(),
+                CombinationOperator = criteria.IsOr ? "or" : "and",
+            };
         }
 
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)

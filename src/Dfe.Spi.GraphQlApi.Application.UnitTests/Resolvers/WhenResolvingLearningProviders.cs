@@ -7,7 +7,6 @@ using AutoFixture.NUnit3;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
-using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models.Entities;
@@ -193,7 +192,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
         private bool IsSearchRequestWithNameFilter(SearchRequest searchRequest, string name)
         {
-            return searchRequest.Filter.Any(f => f.Field == "Name" && f.Value == name);
+            return searchRequest.Groups[0].Filter.Any(f => f.Field == "Name" && f.Value == name);
         }
     }
 }
