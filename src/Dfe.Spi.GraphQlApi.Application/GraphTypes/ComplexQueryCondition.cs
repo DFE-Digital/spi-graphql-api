@@ -21,7 +21,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 .Name("operator")
                 .Description("Operator to use to compare");
 
-            Field(x => x.Operator)
+            Field(x => x.Value, nullable: true)
                 .Name("value")
                 .Description("Value to search for");
         }
