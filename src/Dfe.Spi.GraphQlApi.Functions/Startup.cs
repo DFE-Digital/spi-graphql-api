@@ -123,6 +123,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
             
+            // enums
             services.AddScoped<BoardersCodeEnum>();
             services.AddScoped<LearningProviderGenderOfEntryEnum>();
             services.AddScoped<LocalAuthorityCodeEnum>();
@@ -130,8 +131,16 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
             
+            // inputs
+            services.AddScoped<ComplexQueryCondition>();
+            services.AddScoped<ComplexQueryGroup>();
+            services.AddScoped<ComplexQuery>();
+            
+            // entities
             services.AddScoped<Application.GraphTypes.ManagementGroup>();
             services.AddScoped<Application.GraphTypes.LearningProvider>();
+            
+            // schema
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
         }

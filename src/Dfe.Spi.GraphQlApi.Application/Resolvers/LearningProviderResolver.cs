@@ -98,7 +98,15 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
             var references = await _entityReferenceBuilder.GetEntityReferences(new SearchRequest
             {
-                Filter = filters.ToArray(),
+                Groups = new []
+                {
+                    new SearchGroup
+                    {
+                        Filter = filters.ToArray(),
+                        CombinationOperator = "and",
+                    }, 
+                },
+                CombinationOperator = "and",
             }, cancellationToken);
             return references.FirstOrDefault();
         }
