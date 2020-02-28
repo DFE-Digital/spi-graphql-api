@@ -57,10 +57,12 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             _entityReferenceBuilderMock.Verify(b => b.GetEntityReferences(
                     It.Is<SearchRequest>(r =>
-                        r.Filter != null &&
-                        r.Filter.Length == 1 &&
-                        r.Filter[0].Field == "urn" &&
-                        r.Filter[0].Value == urn.ToString()),
+                        r.Groups != null &&
+                        r.Groups.Length == 1 &&
+                        r.Groups[0].Filter != null &&
+                        r.Groups[0].Filter.Length == 1 &&
+                        r.Groups[0].Filter[0].Field == "urn" &&
+                        r.Groups[0].Filter[0].Value == urn.ToString()),
                     context.CancellationToken),
                 Times.Once);
         }
