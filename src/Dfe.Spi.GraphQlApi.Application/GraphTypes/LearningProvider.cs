@@ -6,7 +6,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
     public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
-        public LearningProvider(IManagementGroupProvider managementGroupProvider)
+        public LearningProvider(IManagementGroupProvider managementGroupProvider, ILineageResolver lineageResolver)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -301,6 +301,10 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.ResourcedProvisionNumberOnRoll, nullable: true)
                 .Name("resourcedProvisionNumberOnRoll")
                 .Description("Resourced Provision Number On Roll");
+            
+            
+            Field<ListGraphType<LineageEntry>>("_lineage",
+                resolve: lineageResolver.ResolveAsync);
             
             Field<ManagementGroup>("managementGroup",
                 resolve: managementGroupProvider.ResolveAsync);
