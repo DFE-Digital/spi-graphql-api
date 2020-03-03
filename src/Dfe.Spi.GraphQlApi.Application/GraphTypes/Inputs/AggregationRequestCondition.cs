@@ -1,3 +1,4 @@
+using Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs
@@ -5,20 +6,22 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs
     public class AggregationRequestConditionModel
     {
         public string Field { get; set; }
-        public string Operator { get; set; }
+        public Common.Models.DataOperator Operator { get; set; }
         public string Value { get; set; }
     }
     public class AggregationRequestCondition : InputObjectGraphType<ComplexQueryConditionModel>
     {
         public AggregationRequestCondition()
         {
-            Field(x => x.Field)
-                .Name("field")
-                .Description("Name of the field to query on");
-
-            Field(x => x.Operator, nullable: true)
-                .Name("operator")
-                .Description("Operator to use to compare");
+            Field<NonNullGraphType<CensusAggregationFieldsEnum>>(
+                name: "field",
+                description: "Name of the field to query on",
+                resolve: ctx => ctx.Source.Field);
+            
+            Field<OperatorEnum>(
+                name: "operator",
+                description: "Operator to use to compare",
+                resolve: ctx => ctx.Source.Operator);
 
             Field(x => x.Value, nullable: true)
                 .Name("value")

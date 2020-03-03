@@ -12,7 +12,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         public Task<Census> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
     }
 }

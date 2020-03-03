@@ -133,6 +133,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
             services.AddScoped<LocalAuthorityCodeEnum>();
+            services.AddScoped<OperatorEnum>();
             
             // inputs
             services.AddScoped<ComplexQueryCondition>();
