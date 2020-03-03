@@ -7,21 +7,20 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
-    public interface IManagementGroupProvider : IResolver<Models.Entities.ManagementGroup>
+    public interface IManagementGroupResolver : IResolver<Models.Entities.ManagementGroup>
     {
     }
-    public class ManagementGroupProvider : IManagementGroupProvider
+    public class ManagementGroupResolver : IManagementGroupResolver
     {
         private readonly IRegistryProvider _registryProvider;
         private readonly IEntityRepository _entityRepository;
 
-        public ManagementGroupProvider(
+        public ManagementGroupResolver(
             IRegistryProvider registryProvider,
             IEntityRepository entityRepository)
         {

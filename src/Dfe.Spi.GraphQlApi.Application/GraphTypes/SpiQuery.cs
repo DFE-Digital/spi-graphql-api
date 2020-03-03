@@ -1,3 +1,4 @@
+using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using GraphQL.Types;
 
