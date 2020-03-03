@@ -1,13 +1,15 @@
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
-using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
     public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
-        public LearningProvider(IManagementGroupResolver managementGroupResolver, ILineageResolver lineageResolver)
+        public LearningProvider(
+            IManagementGroupResolver managementGroupResolver, 
+            ILineageResolver lineageResolver,
+            ICensusResolver censusResolver)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -309,6 +311,14 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             
             Field<ManagementGroup>("managementGroup",
                 resolve: managementGroupResolver.ResolveAsync);
+            
+            Field<Census>("census",
+                resolve: censusResolver.ResolveAsync,
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<IntGraphType> {Name = "year"},
+                    new QueryArgument<StringGraphType> {Name = "type"},
+                }));
         }
     }
 }

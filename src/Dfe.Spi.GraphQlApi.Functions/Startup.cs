@@ -127,18 +127,23 @@ namespace Dfe.Spi.GraphQlApi.Functions
             
             // enums
             services.AddScoped<BoardersCodeEnum>();
+            services.AddScoped<CensusAggregationFieldsEnum>();
             services.AddScoped<LearningProviderGenderOfEntryEnum>();
-            services.AddScoped<LocalAuthorityCodeEnum>();
             services.AddScoped<LearningProviderStatusEnum>();
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
+            services.AddScoped<LocalAuthorityCodeEnum>();
             
             // inputs
             services.AddScoped<ComplexQueryCondition>();
             services.AddScoped<ComplexQueryGroup>();
             services.AddScoped<ComplexQuery>();
+            services.AddScoped<AggregationRequestCondition>();
+            services.AddScoped<AggregationRequest>();
             
             // entities
+            services.AddScoped<Application.GraphTypes.Census>();
+            services.AddScoped<Application.GraphTypes.Aggregation>();
             services.AddScoped<Application.GraphTypes.ManagementGroup>();
             services.AddScoped<Application.GraphTypes.LearningProvider>();
             services.AddScoped<Application.GraphTypes.LineageEntry>();
