@@ -1,4 +1,5 @@
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
+using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
@@ -14,6 +15,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field<ListGraphType<Aggregation>>(
                 name: "_aggregations",
                 description: "Results of requested aggregations",
+                resolve: ctx => ctx.Source._Aggregations,
                 arguments: new QueryArguments(
                     new QueryArgument<ListGraphType<AggregationRequest>>{ Name= "definitions" }));
         }
