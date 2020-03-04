@@ -3,13 +3,7 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs
 {
-    public class AggregationRequestConditionModel
-    {
-        public string Field { get; set; }
-        public Common.Models.DataOperator Operator { get; set; }
-        public string Value { get; set; }
-    }
-    public class AggregationRequestCondition : InputObjectGraphType<ComplexQueryConditionModel>
+    public class AggregationRequestCondition : InputObjectGraphType<Domain.Repository.AggregationRequestCondition>
     {
         public AggregationRequestCondition()
         {

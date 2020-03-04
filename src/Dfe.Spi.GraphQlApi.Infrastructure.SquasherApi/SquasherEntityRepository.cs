@@ -55,6 +55,30 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             return await LoadAsync<ManagementGroup>(request, cancellationToken);
         }
 
+        public async Task<EntityCollection<Census>> LoadCensusAsync(LoadCensusRequest request, CancellationToken cancellationToken)
+        {
+            var censuses = request.EntityReferences.Select(entityReference =>
+                new Census
+                {
+                    Name = entityReference.AdapterRecordReferences.First().SourceSystemId,
+                    _Aggregations = request.Aggregations.Select(aggregationRequest => 
+                        new Aggregation
+                        {
+                            Name = aggregationRequest.Name,
+                            Value = 297812m,
+                        }).ToArray(),
+                }).ToArray();
+
+            return new EntityCollection<Census>
+            {
+                SquashedEntityResults = censuses.Select(census =>
+                    new SquashedEntityResult<Census>
+                    {
+                        SquashedEntity = census,
+                    }).ToArray(),
+            };
+        }
+
 
         private async Task<EntityCollection<T>> LoadAsync<T>(LoadEntitiesRequest request, CancellationToken cancellationToken) where T : ModelsBase
         {

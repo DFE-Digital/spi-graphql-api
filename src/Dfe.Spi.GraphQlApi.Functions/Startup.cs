@@ -139,8 +139,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<ComplexQueryCondition>();
             services.AddScoped<ComplexQueryGroup>();
             services.AddScoped<ComplexQuery>();
-            services.AddScoped<AggregationRequestCondition>();
-            services.AddScoped<AggregationRequest>();
+            services.AddScoped<Application.GraphTypes.Inputs.AggregationRequestCondition>();
+            services.AddScoped<Application.GraphTypes.Inputs.AggregationRequest>();
             
             // entities
             services.AddScoped<Application.GraphTypes.Census>();

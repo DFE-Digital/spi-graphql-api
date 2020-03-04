@@ -2,13 +2,7 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs
 {
-    public class AggregationRequestModel
-    {
-        public string Name { get; set; }
-        public AggregationRequestConditionModel[] Conditions { get; set; }
-    }
-    
-    public class AggregationRequest : InputObjectGraphType<AggregationRequestModel>
+    public class AggregationRequest : InputObjectGraphType<Domain.Repository.AggregationRequest>
     {
         public AggregationRequest()
         {
