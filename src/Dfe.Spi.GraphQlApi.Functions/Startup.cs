@@ -48,6 +48,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
                 () => new JsonSerializerSettings()
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    NullValueHandling = NullValueHandling.Ignore,
                 };
 
             LoadAndAddConfiguration(services);

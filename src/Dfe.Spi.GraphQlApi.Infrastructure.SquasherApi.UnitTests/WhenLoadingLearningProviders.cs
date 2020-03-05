@@ -15,6 +15,7 @@ using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models.Entities;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using RestSharp;
 
@@ -48,7 +49,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
             {
                 SquasherApiBaseUrl = "https://search.example.com/"
             };
-            
+
             _executionContextManager = new Mock<ISpiExecutionContextManager>();
             _executionContextManager.Setup(m => m.SpiExecutionContext)
                 .Returns(new SpiExecutionContext());
@@ -67,6 +68,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
         [Test, AutoData]
         public async Task ThenItShouldPostSearchRequestToLearningProvidersEndpoint(LoadLearningProvidersRequest request)
         {
+            request.AggregatesRequest = null;
+            
             await _repository.LoadLearningProvidersAsync(request, _cancellationToken);
 
             var expectedTranslatedRequest = new GetSquashedEntitiesRequest
@@ -75,7 +78,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                 EntityReferences = request.EntityReferences.Select(er =>
                     new SquasherEntityReference
                     {
-                        AdapterRecordReferences = er.AdapterRecordReferences.Select(arr=>
+                        AdapterRecordReferences = er.AdapterRecordReferences.Select(arr =>
                             new SquasherAdapterReference
                             {
                                 Source = arr.SourceSystemName,

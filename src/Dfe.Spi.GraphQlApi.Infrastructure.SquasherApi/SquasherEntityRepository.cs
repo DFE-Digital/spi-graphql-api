@@ -6,7 +6,6 @@ using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
-using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models;
@@ -58,27 +57,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
         public async Task<EntityCollection<Census>> LoadCensusAsync(LoadCensusRequest request, CancellationToken cancellationToken)
         {
-            var random = new Random();
-            var censuses = request.EntityReferences.Select(EntityReference =>
-                new Census
-                {
-                    Name = EntityReference.AdapterRecordReferences.First().SourceSystemId,
-                    _Aggregations = request.AggregatesRequest.AggregateQueries.Select(kvp=>
-                        new Aggregation
-                        {
-                            Name = kvp.Key,
-                            Value = (decimal)Math.Round(random.Next(10, 1000) * random.NextDouble(), 2),
-                        }).ToArray(),
-                });
-
-            return new EntityCollection<Census>
-            {
-                SquashedEntityResults = censuses.Select(census =>
-                    new SquashedEntityResult<Census>
-                    {
-                        SquashedEntity = census,
-                    }).ToArray(),
-            };
+            return await LoadAsync<Census>(request, cancellationToken);
         }
 
 
@@ -100,6 +79,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
                             }).ToArray(),
                     })?.ToArray(),
                 Fields = request.Fields,
+                AggregatesRequest = request.AggregatesRequest,
             };
             var json = JsonConvert.SerializeObject(squasherRequest);
             _logger.Debug($"Search request going to {resource} is {json}");
@@ -121,23 +101,5 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
             return results;
         }
-    }
-
-    public class GetSquashedEntitiesRequest
-    {
-        public string EntityName { get; set; }
-        public SquasherEntityReference[] EntityReferences { get; set; }
-        public string[] Fields { get; set; }
-    }
-
-    public class SquasherEntityReference
-    {
-        public SquasherAdapterReference[] AdapterRecordReferences { get; set; }
-    }
-
-    public class SquasherAdapterReference
-    {
-        public string Source { get; set; }
-        public string Id { get; set; }
     }
 }

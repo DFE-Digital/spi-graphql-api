@@ -66,6 +66,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
         [Test, AutoData]
         public async Task ThenItShouldPostSearchRequestToManagementGroupsEndpoint(LoadManagementGroupsRequest request)
         {
+            request.AggregatesRequest = null;
+            
             await _repository.LoadManagementGroupsAsync(request, _cancellationToken);
 
             var expectedTranslatedRequest = new GetSquashedEntitiesRequest
