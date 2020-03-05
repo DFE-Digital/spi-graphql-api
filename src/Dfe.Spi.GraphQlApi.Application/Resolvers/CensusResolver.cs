@@ -46,7 +46,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         public async Task<Models.Entities.Census> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
-            var aggregationRequests = DeserializeAggregationRequests(context);
+            var aggregationRequest = DeserializeAggregationRequests(context);
             var entityId = BuildEntityId(context);
 
             var request = new LoadCensusRequest
@@ -65,7 +65,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                         }
                     },
                 },
-                Aggregations = aggregationRequests,
+                AggregatesRequest = aggregationRequest,
             };
             var censuses = await _entityRepository.LoadCensusAsync(request, context.CancellationToken);
             return censuses.SquashedEntityResults.FirstOrDefault()?.SquashedEntity;
@@ -81,7 +81,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
             return $"{year}-{type}-{nameof(LearningProvider)}-{sourceLearningProvider.Urn}";
         }
-        private Domain.Repository.AggregationRequest[] DeserializeAggregationRequests<TContext>(
+        private AggregatesRequest DeserializeAggregationRequests<TContext>(
             ResolveFieldContext<TContext> context)
         {
             var aggregations = context.FieldAst.SelectionSet.Selections
@@ -99,13 +99,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
 
             var definitions = (List<object>) definitionsArgument.Value.Value;
-            var aggregationRequests = new List<Domain.Repository.AggregationRequest>();
+            var request = new AggregatesRequest();
             
             foreach (Dictionary<string, object> definition in definitions)
             {
                 var name = (string) definition["name"];
                 var conditions = (List<object>) definition["conditions"];
-                var aggregationRequestConditions = new List<Domain.Repository.AggregationRequestCondition>();
+                var dataFilters = new List<AggregateDataFilter>();
 
                 foreach (Dictionary<string, object> condition in conditions)
                 {
@@ -119,7 +119,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                         }
                     }
                     
-                    aggregationRequestConditions.Add(new Domain.Repository.AggregationRequestCondition
+                    dataFilters.Add(new AggregateDataFilter
                     {
                         Field = (string)condition["field"],
                         Operator = conditionOperator,
@@ -127,14 +127,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     });
                 }
                 
-                aggregationRequests.Add(new Domain.Repository.AggregationRequest
-                {
-                    Name = name,
-                    Conditions = aggregationRequestConditions.ToArray(),
-                });
+                request.AggregateQueries.Add(name, new AggregateQuery { DataFilters = dataFilters.ToArray() });
             }
 
-            return aggregationRequests.ToArray();
+            return request;
         }
     }
 }

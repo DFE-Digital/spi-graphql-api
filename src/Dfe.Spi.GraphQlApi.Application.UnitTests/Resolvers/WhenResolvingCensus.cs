@@ -6,6 +6,7 @@ using AutoFixture.NUnit3;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.Common.WellKnownIdentifiers;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
@@ -92,7 +93,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
         [Test]
         [AutoData]
-        public async Task ThenItShouldRequestCensusAggregates(AggregationRequest aggregationRequest1, AggregationRequest aggregationRequest2)
+        public async Task ThenItShouldRequestCensusAggregates(AggregationRequestModel aggregationRequest1, AggregationRequestModel aggregationRequest2)
         {
             var context = BuildLearningProviderResolveFieldContext(
                 aggregationRequests: new[] { aggregationRequest1, aggregationRequest2});
@@ -101,12 +102,13 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             
             _entityRepositoryMock.Verify(r => r.LoadCensusAsync(
                     It.Is<LoadCensusRequest>(req =>
-                        req.Aggregations != null &&
-                        req.Aggregations.Length == 2 &&
-                        req.Aggregations[0].Name == aggregationRequest1.Name &&
-                        req.Aggregations[0].Conditions.Length == aggregationRequest1.Conditions.Length &&
-                        req.Aggregations[1].Name == aggregationRequest2.Name &&
-                        req.Aggregations[1].Conditions.Length == aggregationRequest2.Conditions.Length),
+                        req.AggregatesRequest != null &&
+                        req.AggregatesRequest.AggregateQueries!=null &&
+                        req.AggregatesRequest.AggregateQueries.Count == 2 &&
+                        req.AggregatesRequest.AggregateQueries.ContainsKey(aggregationRequest1.Name) &&
+                        req.AggregatesRequest.AggregateQueries[aggregationRequest1.Name].DataFilters.Length == aggregationRequest1.Conditions.Length &&
+                        req.AggregatesRequest.AggregateQueries.ContainsKey(aggregationRequest2.Name) &&
+                        req.AggregatesRequest.AggregateQueries[aggregationRequest2.Name].DataFilters.Length == aggregationRequest2.Conditions.Length),
                     context.CancellationToken),
                 Times.Once());
         }
@@ -114,7 +116,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
         private ResolveFieldContext<LearningProvider> BuildLearningProviderResolveFieldContext(
             LearningProvider source = null, int year = 2020, string type = "SchoolSummer",
-            string[] fields = null, AggregationRequest[] aggregationRequests = null)
+            string[] fields = null, AggregationRequestModel[] aggregationRequests = null)
         {
             if (source == null)
             {

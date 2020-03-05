@@ -6,6 +6,7 @@ using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models;
@@ -57,17 +58,18 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
         public async Task<EntityCollection<Census>> LoadCensusAsync(LoadCensusRequest request, CancellationToken cancellationToken)
         {
-            var censuses = request.EntityReferences.Select(entityReference =>
+            var random = new Random();
+            var censuses = request.EntityReferences.Select(EntityReference =>
                 new Census
                 {
-                    Name = entityReference.AdapterRecordReferences.First().SourceSystemId,
-                    _Aggregations = request.Aggregations.Select(aggregationRequest => 
+                    Name = EntityReference.AdapterRecordReferences.First().SourceSystemId,
+                    _Aggregations = request.AggregatesRequest.AggregateQueries.Select(kvp=>
                         new Aggregation
                         {
-                            Name = aggregationRequest.Name,
-                            Value = 297812m,
+                            Name = kvp.Key,
+                            Value = (decimal)Math.Round(random.Next(10, 1000) * random.NextDouble(), 2),
                         }).ToArray(),
-                }).ToArray();
+                });
 
             return new EntityCollection<Census>
             {
