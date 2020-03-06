@@ -55,6 +55,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             return await LoadAsync<ManagementGroup>(request, cancellationToken);
         }
 
+        public async Task<EntityCollection<Census>> LoadCensusAsync(LoadCensusRequest request, CancellationToken cancellationToken)
+        {
+            return await LoadAsync<Census>(request, cancellationToken);
+        }
+
 
         private async Task<EntityCollection<T>> LoadAsync<T>(LoadEntitiesRequest request, CancellationToken cancellationToken) where T : ModelsBase
         {
@@ -74,6 +79,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
                             }).ToArray(),
                     })?.ToArray(),
                 Fields = request.Fields,
+                AggregatesRequest = request.AggregatesRequest,
             };
             var json = JsonConvert.SerializeObject(squasherRequest);
             _logger.Debug($"Search request going to {resource} is {json}");
@@ -95,23 +101,5 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 
             return results;
         }
-    }
-
-    public class GetSquashedEntitiesRequest
-    {
-        public string EntityName { get; set; }
-        public SquasherEntityReference[] EntityReferences { get; set; }
-        public string[] Fields { get; set; }
-    }
-
-    public class SquasherEntityReference
-    {
-        public SquasherAdapterReference[] AdapterRecordReferences { get; set; }
-    }
-
-    public class SquasherAdapterReference
-    {
-        public string Source { get; set; }
-        public string Id { get; set; }
     }
 }

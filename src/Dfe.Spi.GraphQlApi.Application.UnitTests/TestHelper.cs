@@ -18,12 +18,14 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests
         
         public static ResolveFieldContext<T> BuildResolveFieldContext<T>(
             Dictionary<string, object> arguments = null,
-            string[] fields = null)
+            string[] fields = null,
+            T source = default)
         {
             var context = new ResolveFieldContext<T>
             {
                 CancellationToken = new CancellationToken(),
                 Arguments =  arguments ?? new Dictionary<string, object>(),
+                Source = source,
                 FieldAst = new Field
                 {
                     SelectionSet = new SelectionSet(),

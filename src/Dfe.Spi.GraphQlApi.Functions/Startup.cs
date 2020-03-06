@@ -6,6 +6,8 @@ using Dfe.Spi.Common.Http.Server.Definitions;
 using Dfe.Spi.Common.Logging;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Enumerations;
@@ -46,6 +48,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
                 () => new JsonSerializerSettings()
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    NullValueHandling = NullValueHandling.Ignore,
                 };
 
             LoadAndAddConfiguration(services);
@@ -125,18 +128,24 @@ namespace Dfe.Spi.GraphQlApi.Functions
             
             // enums
             services.AddScoped<BoardersCodeEnum>();
+            services.AddScoped<CensusAggregationFieldsEnum>();
             services.AddScoped<LearningProviderGenderOfEntryEnum>();
-            services.AddScoped<LocalAuthorityCodeEnum>();
             services.AddScoped<LearningProviderStatusEnum>();
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
+            services.AddScoped<LocalAuthorityCodeEnum>();
+            services.AddScoped<OperatorEnum>();
             
             // inputs
             services.AddScoped<ComplexQueryCondition>();
             services.AddScoped<ComplexQueryGroup>();
             services.AddScoped<ComplexQuery>();
+            services.AddScoped<Application.GraphTypes.Inputs.AggregationRequestCondition>();
+            services.AddScoped<Application.GraphTypes.Inputs.AggregationRequest>();
             
             // entities
+            services.AddScoped<Application.GraphTypes.Census>();
+            services.AddScoped<Application.GraphTypes.Aggregation>();
             services.AddScoped<Application.GraphTypes.ManagementGroup>();
             services.AddScoped<Application.GraphTypes.LearningProvider>();
             services.AddScoped<Application.GraphTypes.LineageEntry>();

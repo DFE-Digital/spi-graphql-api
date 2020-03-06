@@ -2,7 +2,7 @@ using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using GraphQL.Types;
 
-namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
+namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums
 {
     public class LearningProviderStatusEnum : EnumerationGraphType
     {

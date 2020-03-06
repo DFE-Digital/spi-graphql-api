@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
+namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs
 {
     public class ComplexQueryConditionModel
     {
