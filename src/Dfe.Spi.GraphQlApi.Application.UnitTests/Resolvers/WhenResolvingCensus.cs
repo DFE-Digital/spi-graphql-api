@@ -79,7 +79,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             await _censusResolver.ResolveAsync(context);
 
-            var expectedId = $"{year}-{type}-{nameof(LearningProvider)}-{source.Urn}";
+            var expectedId = $"{year}_{type}-{nameof(LearningProvider)}-{source.Urn}";
             _entityRepositoryMock.Verify(r => r.LoadCensusAsync(
                     It.Is<LoadCensusRequest>(req =>
                         req.EntityReferences.Length == 1 &&

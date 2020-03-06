@@ -79,7 +79,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             var year = context.Arguments["year"];
             var type = context.Arguments["type"];
 
-            return $"{year}-{type}-{nameof(LearningProvider)}-{sourceLearningProvider.Urn}";
+            return $"{year}_{type}-{nameof(LearningProvider)}-{sourceLearningProvider.Urn}";
         }
         private AggregatesRequest DeserializeAggregationRequests<TContext>(
             ResolveFieldContext<TContext> context)
