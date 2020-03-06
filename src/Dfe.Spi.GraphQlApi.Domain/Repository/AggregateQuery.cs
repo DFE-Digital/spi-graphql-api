@@ -1,7 +1,9 @@
+using Dfe.Spi.Common.Models;
+
 namespace Dfe.Spi.GraphQlApi.Domain.Repository
 {
     public class AggregateQuery
     {
-        public AggregateDataFilter[] DataFilters { get; set; }
+        public DataFilter[] DataFilters { get; set; }
     }
 }

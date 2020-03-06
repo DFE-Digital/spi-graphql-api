@@ -105,7 +105,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 var name = (string) definition["name"];
                 var conditions = (List<object>) definition["conditions"];
-                var dataFilters = new List<AggregateDataFilter>();
+                var dataFilters = new List<DataFilter>();
 
                 foreach (Dictionary<string, object> condition in conditions)
                 {
@@ -119,7 +119,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                         }
                     }
                     
-                    dataFilters.Add(new AggregateDataFilter
+                    dataFilters.Add(new DataFilter
                     {
                         Field = (string)condition["field"],
                         Operator = conditionOperator,
