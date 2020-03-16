@@ -28,6 +28,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             ILoggerWrapper logger)
         {
             _restClient = restClient;
+            _restClient.Timeout = 600 * 1000; // 600s - 10m
             _executionContextManager = executionContextManager;
             _restClient.BaseUrl = new Uri(configuration.SquasherApiBaseUrl, UriKind.Absolute);
             if (!string.IsNullOrEmpty(configuration.SquasherApiFunctionKey))
