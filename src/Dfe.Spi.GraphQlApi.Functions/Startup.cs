@@ -155,6 +155,10 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<Application.GraphTypes.LearningProvider>();
             services.AddScoped<Application.GraphTypes.LineageEntry>();
             services.AddScoped<Application.GraphTypes.LineageAlternativeEntry>();
+            services.AddScoped<Application.GraphTypes.Rates>();
+            services.AddScoped<Application.GraphTypes.BaselineFunding>();
+            services.AddScoped<Application.GraphTypes.IllustrativeFunding>();
+            services.AddScoped<Application.GraphTypes.NotionalFunding>();
             
             // schema
             services.AddScoped<SpiQuery>();

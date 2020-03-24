@@ -7,9 +7,10 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     public class LearningProvider : ObjectGraphType<Models.Entities.LearningProvider>
     {
         public LearningProvider(
-            IManagementGroupResolver managementGroupResolver, 
+            IManagementGroupResolver managementGroupResolver,
             ILineageResolver lineageResolver,
-            ICensusResolver censusResolver)
+            ICensusResolver censusResolver,
+            IRatesResolver ratesResolver)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -304,20 +305,27 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.ResourcedProvisionNumberOnRoll, nullable: true)
                 .Name("resourcedProvisionNumberOnRoll")
                 .Description("Resourced Provision Number On Roll");
-            
-            
+
+
             Field<ListGraphType<LineageEntry>>("_lineage",
                 resolve: lineageResolver.ResolveAsync);
-            
+
             Field<ManagementGroup>("managementGroup",
                 resolve: managementGroupResolver.ResolveAsync);
-            
+
             Field<Census>("census",
                 resolve: censusResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
                     new QueryArgument<IntGraphType> {Name = "year"},
                     new QueryArgument<StringGraphType> {Name = "type"},
+                }));
+
+            Field<Rates>("rates",
+                resolve: ratesResolver.ResolveAsync,
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<IntGraphType> {Name = "year"},
                 }));
         }
     }
