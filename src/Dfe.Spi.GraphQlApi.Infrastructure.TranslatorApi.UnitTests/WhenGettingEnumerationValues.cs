@@ -2,6 +2,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Dfe.Spi.Common.Caching.Definitions;
 using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Context.Models;
 using Dfe.Spi.Common.Logging.Definitions;
@@ -18,6 +19,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi.UnitTests
         private EnumerationRepositoryConfiguration _configuration;
         private Mock<IRestClient> _restClientMock;
         private Mock<ISpiExecutionContextManager> _executionContextManager;
+        private Mock<ICacheProvider> _cacheProviderMock;
         private Mock<ILoggerWrapper> _loggerMock;
         private TranslatorApiEnumerationRepository _repository;
         private CancellationToken _cancellationToken;
@@ -48,6 +50,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi.UnitTests
             _executionContextManager = new Mock<ISpiExecutionContextManager>();
             _executionContextManager.Setup(m => m.SpiExecutionContext)
                 .Returns(new SpiExecutionContext());
+            
+            _cacheProviderMock = new Mock<ICacheProvider>();
 
             _loggerMock = new Mock<ILoggerWrapper>();
 
@@ -55,6 +59,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi.UnitTests
                 _configuration,
                 _restClientMock.Object,
                 _executionContextManager.Object,
+                _cacheProviderMock.Object,
                 _loggerMock.Object);
 
             _cancellationToken = new CancellationToken();
