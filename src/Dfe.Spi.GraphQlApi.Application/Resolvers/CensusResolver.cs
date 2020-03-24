@@ -47,10 +47,6 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         public async Task<Models.Entities.Census> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
             var entityId = BuildEntityId(context);
-            if (string.IsNullOrEmpty(entityId))
-            {
-                return null;
-            }
             
             try
             {
