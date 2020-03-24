@@ -46,35 +46,48 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         public async Task<Models.Entities.Census> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
-            var aggregationRequest = DeserializeAggregationRequests(context);
             var entityId = BuildEntityId(context);
-
-            var request = new LoadCensusRequest
+            
+            try
             {
-                EntityReferences = new[]
+                var aggregationRequest = DeserializeAggregationRequests(context);
+
+                var request = new LoadCensusRequest
                 {
-                    new AggregateEntityReference
+                    EntityReferences = new[]
                     {
-                        AdapterRecordReferences = new[]
+                        new AggregateEntityReference
                         {
-                            new EntityReference
+                            AdapterRecordReferences = new[]
                             {
-                                SourceSystemId = entityId,
-                                SourceSystemName = SourceSystemNames.IStore,
-                            },
-                        }
+                                new EntityReference
+                                {
+                                    SourceSystemId = entityId,
+                                    SourceSystemName = SourceSystemNames.IStore,
+                                },
+                            }
+                        },
                     },
-                },
-                AggregatesRequest = aggregationRequest,
-            };
-            var censuses = await _entityRepository.LoadCensusAsync(request, context.CancellationToken);
-            return censuses.SquashedEntityResults.FirstOrDefault()?.SquashedEntity;
+                    AggregatesRequest = aggregationRequest,
+                };
+                var censuses = await _entityRepository.LoadCensusAsync(request, context.CancellationToken);
+                return censuses.SquashedEntityResults.FirstOrDefault()?.SquashedEntity;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error resolving census for {entityId}: {ex.Message}", ex);
+                throw;
+            }
         }
 
 
         private string BuildEntityId<TContext>(ResolveFieldContext<TContext> context)
         {
             var sourceLearningProvider = context.Source as LearningProvider;
+            if (!sourceLearningProvider.Urn.HasValue)
+            {
+                return null;
+            }
             
             var year = context.Arguments["year"];
             var type = context.Arguments["type"];
