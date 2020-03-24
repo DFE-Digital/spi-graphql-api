@@ -1,5 +1,7 @@
 using System.IO;
 using System.Linq;
+using Dfe.Spi.Common.Caching;
+using Dfe.Spi.Common.Caching.Definitions;
 using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http.Server;
 using Dfe.Spi.Common.Http.Server.Definitions;
@@ -60,6 +62,9 @@ namespace Dfe.Spi.GraphQlApi.Functions
             AddEnumerationRepository(services);
             AddResolvers(services);
             AddGraphQL(services);
+
+            services
+                .AddSingleton<ICacheProvider, CacheProvider>();
         }
 
         private void LoadAndAddConfiguration(IServiceCollection services)
