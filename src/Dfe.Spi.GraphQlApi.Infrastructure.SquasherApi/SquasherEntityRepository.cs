@@ -61,6 +61,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             return await LoadAsync<Census>(request, cancellationToken);
         }
 
+        public async Task<EntityCollection<Rates>> LoadRatesAsync(LoadRatesRequest request, CancellationToken cancellationToken)
+        {
+            return await LoadAsync<Rates>(request, cancellationToken);
+        }
+
 
         private async Task<EntityCollection<T>> LoadAsync<T>(LoadEntitiesRequest request, CancellationToken cancellationToken) where T : ModelsBase
         {
