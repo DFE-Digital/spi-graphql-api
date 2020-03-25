@@ -76,6 +76,12 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private SearchRequest GetSearchRequest<T>(ResolveFieldContext<T> context)
         {
             var criteria = (ComplexQueryModel) context.GetArgument(typeof(ComplexQueryModel), "criteria");
+            var skip = context.HasArgument("skip")
+                ? (int) context.Arguments["skip"]
+                : 0;
+            var take = context.HasArgument("take")
+                ? (int) context.Arguments["take"]
+                : 50;
 
             var searchGroups = new List<SearchGroup>();
             foreach (var @group in criteria.Groups)
@@ -98,8 +104,8 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 Groups = searchGroups.ToArray(),
                 CombinationOperator = criteria.IsOr ? "or" : "and",
-                Skip = 0,
-                Take = 50,
+                Skip = skip,
+                Take = take,
             };
         }
 

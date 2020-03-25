@@ -35,7 +35,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 {
                     SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
-            
+
             _registryProviderMock = new Mock<IRegistryProvider>();
             _registryProviderMock.Setup(r =>
                     r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
@@ -49,7 +49,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         },
                     }
                 });
-            
+
             _loggerMock = new Mock<ILoggerWrapper>();
 
             _resolver = new LearningProvidersResolver(
@@ -77,14 +77,64 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
                     It.Is<SearchRequest>(r =>
-                        r.Skip == 0 &&
-                        r.Take == 50 &&
                         r.Groups != null &&
                         r.Groups.Length == 1 &&
                         r.Groups[0].Filter != null &&
                         r.Groups[0].Filter.Length == 1 &&
                         r.Groups[0].Filter[0].Field == "Name" &&
                         r.Groups[0].Filter[0].Value == name),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task ThenItShouldDefaultToSkipZeroIfNotSpecified()
+        {
+            var context = BuildResolveFieldContext();
+
+            await _resolver.ResolveAsync(context);
+
+            _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
+                    It.Is<SearchRequest>(r => r.Skip == 0),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task ThenItShouldUseSkipArgumentIfSpecified()
+        {
+            var context = BuildResolveFieldContext(skip: 25);
+
+            await _resolver.ResolveAsync(context);
+
+            _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
+                    It.Is<SearchRequest>(r => r.Skip == 25),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task ThenItShouldDefaultToTake50IfNotSpecified()
+        {
+            var context = BuildResolveFieldContext();
+
+            await _resolver.ResolveAsync(context);
+
+            _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
+                    It.Is<SearchRequest>(r => r.Take == 50),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task ThenItShouldUseTakeArgumentIfSpecified()
+        {
+            var context = BuildResolveFieldContext(take: 36);
+
+            await _resolver.ResolveAsync(context);
+
+            _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
+                    It.Is<SearchRequest>(r => r.Take == 36),
                     context.CancellationToken),
                 Times.Once);
         }
@@ -96,19 +146,19 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SearchResultSet
                 {
-                    Results = entityReferences.Select(r=>
+                    Results = entityReferences.Select(r =>
                         new SearchResult
                         {
                             Entities = r.AdapterRecordReferences,
                         }).ToArray(),
                 });
             var context = BuildResolveFieldContext();
-            
+
             await _resolver.ResolveAsync(context);
-            
-            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
-                It.Is<LoadLearningProvidersRequest>(req=>req.EntityReferences.Length == entityReferences.Length),
-                context.CancellationToken),
+
+            _entityRepositoryMock.Verify(r => r.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(req => req.EntityReferences.Length == entityReferences.Length),
+                    context.CancellationToken),
                 Times.Once);
         }
 
@@ -119,7 +169,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SearchResultSet
                 {
-                    Results = entityReferences.Select(r=>
+                    Results = entityReferences.Select(r =>
                         new SearchResult
                         {
                             Entities = r.AdapterRecordReferences,
@@ -127,28 +177,29 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 });
             var fields = new[] {"name", "urn", "ukprn"};
             var context = BuildResolveFieldContext(fields: fields);
-            
+
             await _resolver.ResolveAsync(context);
-            
-            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
-                It.Is<LoadLearningProvidersRequest>(req=>
-                    req.Fields != null &&
-                    req.Fields.Length == 3 &&
-                    req.Fields.Contains("urn") &&
-                    req.Fields.Contains("ukprn") &&
-                    req.Fields.Contains("name")),
-                context.CancellationToken),
+
+            _entityRepositoryMock.Verify(r => r.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(req =>
+                        req.Fields != null &&
+                        req.Fields.Length == 3 &&
+                        req.Fields.Contains("urn") &&
+                        req.Fields.Contains("ukprn") &&
+                        req.Fields.Contains("name")),
+                    context.CancellationToken),
                 Times.Once);
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldAlwaysUseUrnAndUkprnInFieldsWhenGettingReferencedEntities(AggregateEntityReference[] entityReferences)
+        public async Task ThenItShouldAlwaysUseUrnAndUkprnInFieldsWhenGettingReferencedEntities(
+            AggregateEntityReference[] entityReferences)
         {
             _registryProviderMock.Setup(r =>
                     r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SearchResultSet
                 {
-                    Results = entityReferences.Select(r=>
+                    Results = entityReferences.Select(r =>
                         new SearchResult
                         {
                             Entities = r.AdapterRecordReferences,
@@ -156,18 +207,18 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 });
             var fields = new[] {"name", "postcode"};
             var context = BuildResolveFieldContext(fields: fields);
-            
+
             await _resolver.ResolveAsync(context);
-            
-            _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
-                It.Is<LoadLearningProvidersRequest>(req=>
-                    req.Fields != null &&
-                    req.Fields.Length == 4 &&
-                    req.Fields.Contains("urn") &&
-                    req.Fields.Contains("ukprn") &&
-                    req.Fields.Contains("name") &&
-                    req.Fields.Contains("postcode")),
-                context.CancellationToken),
+
+            _entityRepositoryMock.Verify(r => r.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(req =>
+                        req.Fields != null &&
+                        req.Fields.Length == 4 &&
+                        req.Fields.Contains("urn") &&
+                        req.Fields.Contains("ukprn") &&
+                        req.Fields.Contains("name") &&
+                        req.Fields.Contains("postcode")),
+                    context.CancellationToken),
                 Times.Once);
         }
 
@@ -186,9 +237,9 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         }).ToArray(),
                 });
             var context = BuildResolveFieldContext();
-        
+
             var actual = await _resolver.ResolveAsync(context);
-        
+
             Assert.AreEqual(entities.Length, actual.Length);
             for (var i = 0; i < entities.Length; i++)
             {
@@ -198,7 +249,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null)
+        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null, int? skip = null, int? take = null)
         {
             var groups = new List<object>
             {
@@ -220,13 +271,25 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             };
             var criteria = new Dictionary<string, object>
             {
-                { "isAnd", true },
-                { "groups", groups }
+                {"isAnd", true},
+                {"groups", groups}
             };
-            return TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
+            
+            var arguments = new Dictionary<string, object>
             {
                 {"criteria", criteria},
-            }, fields: fields);
+            };
+
+            if (skip.HasValue)
+            {
+                arguments.Add("skip", skip.Value);
+            }
+            if (take.HasValue)
+            {
+                arguments.Add("take", take.Value);
+            }
+            
+            return TestHelper.BuildResolveFieldContext<object>(arguments: arguments, fields: fields);
         }
     }
 }
