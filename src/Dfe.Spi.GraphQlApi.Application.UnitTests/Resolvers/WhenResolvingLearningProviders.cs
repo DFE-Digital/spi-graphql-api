@@ -7,8 +7,9 @@ using AutoFixture.NUnit3;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
+using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models.Entities;
 using GraphQL.Types;
 using Moq;
@@ -19,8 +20,8 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
     public class WhenResolvingLearningProviders
     {
         private Mock<IEntityRepository> _entityRepositoryMock;
+        private Mock<IRegistryProvider> _registryProviderMock;
         private Mock<ILoggerWrapper> _loggerMock;
-        private Mock<IEntityReferenceBuilder> _entityReferenceBuilderMock;
         private LearningProvidersResolver _resolver;
 
         [SetUp]
@@ -35,17 +36,26 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     SquashedEntityResults = new SquashedEntityResult<LearningProvider>[0],
                 });
             
-            _loggerMock = new Mock<ILoggerWrapper>();
+            _registryProviderMock = new Mock<IRegistryProvider>();
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = new[]
+                    {
+                        new SearchResult
+                        {
+                            Entities = new EntityReference[0],
+                        },
+                    }
+                });
             
-            _entityReferenceBuilderMock = new Mock<IEntityReferenceBuilder>();
-            _entityReferenceBuilderMock.Setup(b =>
-                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AggregateEntityReference[0]);
+            _loggerMock = new Mock<ILoggerWrapper>();
 
             _resolver = new LearningProvidersResolver(
                 _entityRepositoryMock.Object,
-                _loggerMock.Object,
-                _entityReferenceBuilderMock.Object);
+                _registryProviderMock.Object,
+                _loggerMock.Object);
         }
 
         [Test]
@@ -65,8 +75,16 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             await _resolver.ResolveAsync(context);
 
-            _entityReferenceBuilderMock.Verify(
-                p => p.GetEntityReferences(It.Is<SearchRequest>(r => IsSearchRequestWithNameFilter(r, name)),
+            _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
+                    It.Is<SearchRequest>(r =>
+                        r.Skip == 0 &&
+                        r.Take == 50 &&
+                        r.Groups != null &&
+                        r.Groups.Length == 1 &&
+                        r.Groups[0].Filter != null &&
+                        r.Groups[0].Filter.Length == 1 &&
+                        r.Groups[0].Filter[0].Field == "Name" &&
+                        r.Groups[0].Filter[0].Value == name),
                     context.CancellationToken),
                 Times.Once);
         }
@@ -74,15 +92,22 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         [Test, AutoData]
         public async Task ThenItShouldUseBuiltEntityReferencesToLoadData(AggregateEntityReference[] entityReferences)
         {
-            _entityReferenceBuilderMock.Setup(b =>
-                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(entityReferences);
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = entityReferences.Select(r=>
+                        new SearchResult
+                        {
+                            Entities = r.AdapterRecordReferences,
+                        }).ToArray(),
+                });
             var context = BuildResolveFieldContext();
             
             await _resolver.ResolveAsync(context);
             
             _entityRepositoryMock.Verify(r=>r.LoadLearningProvidersAsync(
-                It.Is<LoadLearningProvidersRequest>(req=>req.EntityReferences == entityReferences),
+                It.Is<LoadLearningProvidersRequest>(req=>req.EntityReferences.Length == entityReferences.Length),
                 context.CancellationToken),
                 Times.Once);
         }
@@ -90,9 +115,16 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         [Test, AutoData]
         public async Task ThenItShouldRequestFieldsFromGraphQuery(AggregateEntityReference[] entityReferences)
         {
-            _entityReferenceBuilderMock.Setup(b =>
-                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(entityReferences);
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = entityReferences.Select(r=>
+                        new SearchResult
+                        {
+                            Entities = r.AdapterRecordReferences,
+                        }).ToArray(),
+                });
             var fields = new[] {"name", "urn", "ukprn"};
             var context = BuildResolveFieldContext(fields: fields);
             
@@ -112,9 +144,16 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         [Test, AutoData]
         public async Task ThenItShouldAlwaysUseUrnAndUkprnInFieldsWhenGettingReferencedEntities(AggregateEntityReference[] entityReferences)
         {
-            _entityReferenceBuilderMock.Setup(b =>
-                    b.GetEntityReferences(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(entityReferences);
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = entityReferences.Select(r=>
+                        new SearchResult
+                        {
+                            Entities = r.AdapterRecordReferences,
+                        }).ToArray(),
+                });
             var fields = new[] {"name", "postcode"};
             var context = BuildResolveFieldContext(fields: fields);
             
@@ -188,11 +227,6 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             {
                 {"criteria", criteria},
             }, fields: fields);
-        }
-
-        private bool IsSearchRequestWithNameFilter(SearchRequest searchRequest, string name)
-        {
-            return searchRequest.Groups[0].Filter.Any(f => f.Field == "Name" && f.Value == name);
         }
     }
 }

@@ -42,6 +42,31 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
 
             _logger = logger;
         }
+
+        public async Task<SearchResultSet> SearchLearningProvidersAsync(SearchRequest request, CancellationToken cancellationToken)
+        {
+            var resource = $"search/learning-providers";
+            _logger.Debug($"Searching {resource}");
+
+            var json = JsonConvert.SerializeObject(request);
+            
+            var httpRequest = new RestRequest(resource, Method.POST);
+            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
+            httpRequest.AddParameter(string.Empty, json, "application/json", ParameterType.RequestBody);
+            
+            var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                throw new RegistryApiException(resource, response.StatusCode, response.Content);
+            }
+            _logger.Debug($"Search response json from {resource} is ${response.Content}");
+
+            var resultset = JsonConvert.DeserializeObject<SearchResultSet>(response.Content);
+            _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(resultset)}");
+
+            return resultset;
+        }
+
         public async Task<EntityReference[]> GetSynonymsAsync(string entityType, string sourceSystem, string sourceSystemId,
             CancellationToken cancellationToken)
         {
