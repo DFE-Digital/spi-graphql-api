@@ -24,8 +24,12 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 
             Field<ListGraphType<LearningProvider>>("learningProviders",
                 resolve: learningProvidersResolver.ResolveAsync,
-                arguments: new QueryArguments(
-                    new QueryArgument<ComplexQuery> { Name = "criteria" }));
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<ComplexQuery> { Name = "criteria" },
+                    new QueryArgument<IntGraphType> { Name = "skip" },
+                    new QueryArgument<IntGraphType> { Name = "take" },
+                }));
         }
     }
 }

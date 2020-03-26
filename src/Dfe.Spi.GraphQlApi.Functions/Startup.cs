@@ -15,10 +15,8 @@ using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Enumerations;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.GraphQlApi.Functions;
 using Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi;
-using Dfe.Spi.GraphQlApi.Infrastructure.SearchApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi;
 using GraphQL;
@@ -56,7 +54,6 @@ namespace Dfe.Spi.GraphQlApi.Functions
             LoadAndAddConfiguration(services);
             AddLogging(services);
             AddHttp(services);
-            AddSearch(services);
             AddRegistry(services);
             AddEntityRepository(services);
             AddEnumerationRepository(services);
@@ -79,7 +76,6 @@ namespace Dfe.Spi.GraphQlApi.Functions
             _configuration = new GraphApiConfiguration();
             _rawConfiguration.Bind(_configuration);
             services.AddSingleton(_configuration);
-            services.AddSingleton(_configuration.Search);
             services.AddSingleton(_configuration.Registry);
             services.AddSingleton(_configuration.EntityRepository);
             services.AddSingleton(_configuration.EnumerationRepository);
@@ -163,11 +159,6 @@ namespace Dfe.Spi.GraphQlApi.Functions
             // schema
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
-        }
-
-        private void AddSearch(IServiceCollection services)
-        {
-            services.AddScoped<ISearchProvider, SearchApiSearchProvider>();
         }
 
         private void AddRegistry(IServiceCollection services)
