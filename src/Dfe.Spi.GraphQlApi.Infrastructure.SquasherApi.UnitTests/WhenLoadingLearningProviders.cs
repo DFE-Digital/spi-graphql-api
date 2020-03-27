@@ -11,7 +11,6 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using Dfe.Spi.Models.Entities;
 using Moq;
 using Newtonsoft.Json;

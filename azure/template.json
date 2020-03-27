@@ -33,12 +33,6 @@
       "maxLength": 2,
       "defaultValue": "01"
     },
-    "searchApiUrl": {
-      "type": "string"
-    },
-    "searchSubscriptionKey": {
-      "type": "securestring"
-    },
     "registryApiUrl": {
       "type": "string"
     },
@@ -167,14 +161,6 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId(variables('sharedResourceGroupName'), 'microsoft.insights/components/', variables('appInsightsName')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "SPI_Search__SearchApiBaseUrl",
-              "value": "[parameters('searchApiUrl')]"
-            },
-            {
-              "name": "SPI_Search__SearchApiSubscriptionKey",
-              "value": "[parameters('searchSubscriptionKey')]"
             },
             {
               "name": "SPI_Registry__RegistryApiBaseUrl",

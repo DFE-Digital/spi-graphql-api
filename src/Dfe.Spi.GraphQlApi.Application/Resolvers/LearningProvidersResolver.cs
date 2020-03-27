@@ -4,12 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
-using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
-using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using LearningProvider = Dfe.Spi.Models.Entities.LearningProvider;
@@ -23,43 +20,24 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     public class LearningProvidersResolver : ILearningProvidersResolver
     {
         private readonly IEntityRepository _entityRepository;
+        private readonly IRegistryProvider _registryProvider;
         private readonly ILoggerWrapper _logger;
-        private readonly IEntityReferenceBuilder _entityReferenceBuilder;
-
-        internal LearningProvidersResolver(
-            IEntityRepository entityRepository,
-            ILoggerWrapper logger,
-            IEntityReferenceBuilder entityReferenceBuilder)
-        {
-            _entityRepository = entityRepository;
-            _logger = logger;
-            _entityReferenceBuilder = entityReferenceBuilder;
-        }
 
         public LearningProvidersResolver(
-            ISearchProvider searchProvider,
             IEntityRepository entityRepository,
             IRegistryProvider registryProvider,
             ILoggerWrapper logger)
         {
             _entityRepository = entityRepository;
+            _registryProvider = registryProvider;
             _logger = logger;
-
-            Task<EntityReference[]> GetSynonyms(string sourceSystem, string sourceId,
-                CancellationToken cancellationToken) =>
-                registryProvider.GetSynonymsAsync("learning-providers", sourceSystem, sourceId, cancellationToken);
-
-            _entityReferenceBuilder = new EntityReferenceBuilder<LearningProviderReference>(
-                searchProvider.SearchLearningProvidersAsync,
-                GetSynonyms);
         }
 
         public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
         {
             try
             {
-                var request = GetSearchRequest(context);
-                var references = await _entityReferenceBuilder.GetEntityReferences(request, context.CancellationToken);
+                var references = await SearchAsync(context, context.CancellationToken);
 
                 var fields = GetRequestedFields(context);
                 var entities = await LoadAsync(references, fields, context.CancellationToken);
@@ -71,6 +49,15 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 _logger.Error($"Error resolving learning providers", ex);
                 throw;
             }
+        }
+
+        private async Task<AggregateEntityReference[]> SearchAsync<T>(ResolveFieldContext<T> context, CancellationToken cancellationToken)
+        {
+            var searchRequest = GetSearchRequest(context);
+            var searchResults = await _registryProvider.SearchLearningProvidersAsync(searchRequest, cancellationToken);
+            return searchResults.Results.Select(d =>
+                    new AggregateEntityReference {AdapterRecordReferences = d.Entities})
+                .ToArray();
         }
 
         private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references, string[] fields,
@@ -89,6 +76,12 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private SearchRequest GetSearchRequest<T>(ResolveFieldContext<T> context)
         {
             var criteria = (ComplexQueryModel) context.GetArgument(typeof(ComplexQueryModel), "criteria");
+            var skip = context.HasArgument("skip")
+                ? (int) context.Arguments["skip"]
+                : 0;
+            var take = context.HasArgument("take")
+                ? (int) context.Arguments["take"]
+                : 50;
 
             var searchGroups = new List<SearchGroup>();
             foreach (var @group in criteria.Groups)
@@ -111,6 +104,8 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 Groups = searchGroups.ToArray(),
                 CombinationOperator = criteria.IsOr ? "or" : "and",
+                Skip = skip,
+                Take = take,
             };
         }
 

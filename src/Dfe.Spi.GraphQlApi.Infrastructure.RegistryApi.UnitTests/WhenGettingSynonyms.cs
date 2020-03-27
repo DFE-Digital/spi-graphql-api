@@ -7,7 +7,6 @@ using Dfe.Spi.Common.Context.Models;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
-using Dfe.Spi.GraphQlApi.Domain.Search;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;

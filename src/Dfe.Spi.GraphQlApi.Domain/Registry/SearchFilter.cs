@@ -1,4 +1,4 @@
-namespace Dfe.Spi.GraphQlApi.Domain.Search
+namespace Dfe.Spi.GraphQlApi.Domain.Registry
 {
     public class SearchFilter
     {
