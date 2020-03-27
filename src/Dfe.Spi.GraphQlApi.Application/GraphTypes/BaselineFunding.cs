@@ -2,7 +2,7 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class BaselineFunding : ObjectGraphType<Models.RatesModels.BaselineFunding>
+    public class BaselineFunding : ObjectGraphType<Models.RatesModels.LearningProviderModels.BaselineFunding>
     {
         public BaselineFunding()
         {

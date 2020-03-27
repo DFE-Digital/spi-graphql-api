@@ -2,7 +2,7 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class NotionalFunding : ObjectGraphType<Models.RatesModels.NotionalFunding>
+    public class NotionalFunding : ObjectGraphType<Models.RatesModels.LearningProviderModels.NotionalFunding>
     {
         public NotionalFunding()
         {

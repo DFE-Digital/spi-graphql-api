@@ -2,7 +2,7 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class Rates : ObjectGraphType<Models.Entities.Rates>
+    public class Rates : ObjectGraphType<Models.Entities.LearningProviderRates>
     {
         public Rates()
         {

@@ -10,7 +10,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             IManagementGroupResolver managementGroupResolver,
             ILineageResolver lineageResolver,
             ICensusResolver censusResolver,
-            IRatesResolver ratesResolver)
+            ILearningProviderRatesResolver learningProviderRatesResolver)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -322,7 +322,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 }));
 
             Field<Rates>("rates",
-                resolve: ratesResolver.ResolveAsync,
+                resolve: learningProviderRatesResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
                     new QueryArgument<IntGraphType> {Name = "year"},

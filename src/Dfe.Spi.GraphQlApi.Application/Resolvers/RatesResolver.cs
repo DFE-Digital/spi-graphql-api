@@ -2,25 +2,23 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
-using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
-using Dfe.Spi.Models.RatesModels;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
-    public interface IRatesResolver : IResolver<Models.Entities.Rates>
+    public interface ILearningProviderRatesResolver : IResolver<Models.Entities.LearningProviderRates>
     {
     }
 
-    public class RatesResolver : IRatesResolver
+    public class LearningProviderRatesResolver : ILearningProviderRatesResolver
     {
         private readonly IEntityRepository _entityRepository;
         private readonly ILoggerWrapper _logger;
 
-        public RatesResolver(
+        public LearningProviderRatesResolver(
             IEntityRepository entityRepository,
             ILoggerWrapper logger)
         {
@@ -29,13 +27,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         }
         
         
-        public async Task<Rates> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
+        public async Task<LearningProviderRates> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
             var entityId = BuildEntityId(context);
             
             try
             {
-                var request = new LoadRatesRequest
+                var request = new LoadLearningProviderRatesRequest
                 {
                     EntityReferences = new[]
                     {
@@ -52,7 +50,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                         },
                     },
                 };
-                var rates = await _entityRepository.LoadRatesAsync(request, context.CancellationToken);
+                var rates = await _entityRepository.LoadLearningProviderRatesAsync(request, context.CancellationToken);
                 return rates.SquashedEntityResults.FirstOrDefault()?.SquashedEntity;
             }
             catch (Exception ex)
@@ -73,7 +71,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             
             var year = context.Arguments["year"];
 
-            return $"{year}-{nameof(LearningProvider)}-{sourceLearningProvider.Urn}";
+            return $"{year}-{sourceLearningProvider.Urn}";
         }
     }
 }
