@@ -69,9 +69,9 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldSearchWithProvidedCriteria(string identifier)
+        public async Task ThenItShouldSearchWithProvidedCriteria(string code)
         {
-            var context = BuildResolveFieldContext(identifier);
+            var context = BuildResolveFieldContext(code);
 
             await _resolver.ResolveAsync(context);
 
@@ -81,8 +81,8 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         r.Groups.Length == 1 &&
                         r.Groups[0].Filter != null &&
                         r.Groups[0].Filter.Length == 1 &&
-                        r.Groups[0].Filter[0].Field == "identifier" &&
-                        r.Groups[0].Filter[0].Value == identifier),
+                        r.Groups[0].Filter[0].Field == "managementGroupId" &&
+                        r.Groups[0].Filter[0].Value == code),
                     context.CancellationToken),
                 Times.Once);
         }
@@ -102,6 +102,25 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         r.Groups[0].Filter.Length == 1 &&
                         r.Groups[0].Filter[0].Field == "managementGroupType" &&
                         r.Groups[0].Filter[0].Value == type),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task ThenItShouldTranslateCodeArgToManagementGroupIdField(string code)
+        {
+            var context = BuildResolveFieldContext(code);
+
+            await _resolver.ResolveAsync(context);
+
+            _registryProviderMock.Verify(b => b.SearchManagementGroupsAsync(
+                    It.Is<SearchRequest>(r =>
+                        r.Groups != null &&
+                        r.Groups.Length == 1 &&
+                        r.Groups[0].Filter != null &&
+                        r.Groups[0].Filter.Length == 1 &&
+                        r.Groups[0].Filter[0].Field == "managementGroupId" &&
+                        r.Groups[0].Filter[0].Value == code),
                     context.CancellationToken),
                 Times.Once);
         }
@@ -267,16 +286,16 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<object> BuildResolveFieldContext(string identifier = null, string type = null, string[] fields = null, int? skip = null, int? take = null)
+        private ResolveFieldContext<object> BuildResolveFieldContext(string code = null, string type = null, string[] fields = null, int? skip = null, int? take = null)
         {
             var conditions = new List<object>();
-            if (identifier != null)
+            if (code != null)
             {
                 conditions.Add(new Dictionary<string, object>
                 {
-                    {"field", "identifier"},
+                    {"field", "code"},
                     {"operator", "equals"},
-                    {"value", identifier},
+                    {"value", code},
                 });
             }
             if (type != null)

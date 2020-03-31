@@ -8,6 +8,8 @@ using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
+using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
 using GraphQL.Language.AST;
@@ -17,9 +19,10 @@ using NUnit.Framework;
 
 namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 {
-    public class WhenResolvingCensus
+    public class WhenResolvingCensusForManagementGroup
     {
         private Mock<IEntityRepository> _entityRepositoryMock;
+        private Mock<IRegistryProvider> _registryProviderMock;
         private Mock<ILoggerWrapper> _loggerMock;
         private CensusResolver _censusResolver;
         private CancellationToken _cancellationToken;
@@ -34,18 +37,20 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 {
                     SquashedEntityResults = new SquashedEntityResult<Census>[0],
                 });
+            
+            _registryProviderMock = new Mock<IRegistryProvider>();
 
             _loggerMock = new Mock<ILoggerWrapper>();
 
             _censusResolver = new CensusResolver(
                 _entityRepositoryMock.Object,
+                _registryProviderMock.Object,
                 _loggerMock.Object);
 
             _cancellationToken = new CancellationToken();
         }
 
-        [Test]
-        [NonRecursiveAutoData]
+        [Test, NonRecursiveAutoData]
         public async Task ThenItShouldReturnSquashedEntity(Census census)
         {
             _entityRepositoryMock.Setup(r => r.LoadCensusAsync(
@@ -60,7 +65,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         },
                     },
                 });
-            var context = BuildLearningProviderResolveFieldContext();
+            var context = BuildManagementGroupResolveFieldContext();
 
             var actual = await _censusResolver.ResolveAsync(context);
 
@@ -71,31 +76,61 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 Times.Once());
         }
 
-        [Test]
-        [NonRecursiveAutoData]
-        public async Task ThenItShouldRequestCensusForYearTypeAndUrn(int year, string type, LearningProvider source)
+        [Test, NonRecursiveAutoData]
+        public async Task ThenItShouldRequestCensusForYearTypeAndUrnOfEachProviderInGroup(int year, string type, ManagementGroup source,
+            LearningProvider learningProvider1, LearningProvider learningProvider2)
         {
-            var context = BuildLearningProviderResolveFieldContext(source, year, type);
+            _registryProviderMock.Setup(reg => reg.GetLinksAsync(
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[]
+                {
+                    new EntityLinkReference
+                    {
+                        LinkType = "ManagementGroup",
+                        SourceSystemName = SourceSystemNames.GetInformationAboutSchools,
+                        SourceSystemId = learningProvider1.Urn.ToString()
+                    },
+                    new EntityLinkReference
+                    {
+                        LinkType = "ManagementGroup",
+                        SourceSystemName = SourceSystemNames.GetInformationAboutSchools,
+                        SourceSystemId = learningProvider2.Urn.ToString()
+                    },
+                });
+            var context = BuildManagementGroupResolveFieldContext(source, year, type);
 
             await _censusResolver.ResolveAsync(context);
 
-            var expectedId = $"{year}_{type}-{nameof(LearningProvider)}-{source.Urn}";
+            var expectedId1 = $"{year}_{type}-{nameof(LearningProvider)}-{learningProvider1.Urn}";
+            var expectedId2 = $"{year}_{type}-{nameof(LearningProvider)}-{learningProvider2.Urn}";
             _entityRepositoryMock.Verify(r => r.LoadCensusAsync(
                     It.Is<LoadCensusRequest>(req =>
                         req.EntityReferences.Length == 1 &&
-                        req.EntityReferences[0].AdapterRecordReferences.Length == 1 &&
-                        req.EntityReferences[0].AdapterRecordReferences[0].SourceSystemName ==
-                        SourceSystemNames.IStore &&
-                        req.EntityReferences[0].AdapterRecordReferences[0].SourceSystemId == expectedId),
+                        req.EntityReferences[0].AdapterRecordReferences.Length == 2 &&
+                        req.EntityReferences[0].AdapterRecordReferences[0].SourceSystemName == SourceSystemNames.IStore &&
+                        req.EntityReferences[0].AdapterRecordReferences[0].SourceSystemId == expectedId1 &&
+                        req.EntityReferences[0].AdapterRecordReferences[1].SourceSystemName == SourceSystemNames.IStore &&
+                        req.EntityReferences[0].AdapterRecordReferences[1].SourceSystemId == expectedId2),
                     context.CancellationToken),
                 Times.Once());
         }
 
-        [Test]
-        [AutoData]
+        [Test, NonRecursiveAutoData]
+        public async Task ThenItShouldGetLinksForManagementGroup(ManagementGroup source)
+        {
+            var context = BuildManagementGroupResolveFieldContext(source);
+
+           await _censusResolver.ResolveAsync(context);
+           
+           _registryProviderMock.Verify(reg=>reg.GetLinksAsync(
+               "management-groups", SourceSystemNames.GetInformationAboutSchools, source.Code, _cancellationToken),
+               Times.Once);
+        }
+
+        [Test, AutoData]
         public async Task ThenItShouldRequestCensusAggregates(AggregationRequestModel aggregationRequest1, AggregationRequestModel aggregationRequest2)
         {
-            var context = BuildLearningProviderResolveFieldContext(
+            var context = BuildManagementGroupResolveFieldContext(
                 aggregationRequests: new[] { aggregationRequest1, aggregationRequest2});
 
             await _censusResolver.ResolveAsync(context);
@@ -114,13 +149,13 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<LearningProvider> BuildLearningProviderResolveFieldContext(
-            LearningProvider source = null, int year = 2020, string type = "SchoolSummer",
+        private ResolveFieldContext<ManagementGroup> BuildManagementGroupResolveFieldContext(
+            ManagementGroup source = null, int year = 2020, string type = "SchoolSummer",
             string[] fields = null, AggregationRequestModel[] aggregationRequests = null)
         {
             if (source == null)
             {
-                source = new LearningProvider();
+                source = new ManagementGroup();
             }
 
             if (fields == null)

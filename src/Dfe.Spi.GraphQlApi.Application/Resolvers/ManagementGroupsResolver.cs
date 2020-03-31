@@ -114,6 +114,8 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 case "type":
                     return "managementGroupType";
+                case "code":
+                    return "managementGroupId";
             }
 
             return searchValue;
