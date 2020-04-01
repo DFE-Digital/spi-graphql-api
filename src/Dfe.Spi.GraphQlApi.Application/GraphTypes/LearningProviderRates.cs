@@ -2,9 +2,9 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
-    public class Rates : ObjectGraphType<Models.Entities.LearningProviderRates>
+    public class LearningProviderRates : ObjectGraphType<Models.Entities.LearningProviderRates>
     {
-        public Rates()
+        public LearningProviderRates()
         {
             Field<BaselineFunding>("baselineFunding",
                 resolve: ctx => ctx.Source.BaselineFunding);
