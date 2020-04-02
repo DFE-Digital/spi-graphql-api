@@ -155,6 +155,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<Application.GraphTypes.BaselineFunding>();
             services.AddScoped<Application.GraphTypes.IllustrativeFunding>();
             services.AddScoped<Application.GraphTypes.NotionalFunding>();
+            services.AddScoped<Application.GraphTypes.ManagementGroupProvisionalFunding>();
+            services.AddScoped<Application.GraphTypes.ManagementGroupRates>();
             
             // schema
             services.AddScoped<SpiQuery>();

@@ -66,6 +66,11 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             return await LoadAsync<LearningProviderRates>(request, cancellationToken);
         }
 
+        public async Task<EntityCollection<ManagementGroupRates>> LoadManagementGroupRatesAsync(LoadManagementGroupRatesRequest request, CancellationToken cancellationToken)
+        {
+            return await LoadAsync<ManagementGroupRates>(request, cancellationToken);
+        }
+
 
         private async Task<EntityCollection<T>> LoadAsync<T>(LoadEntitiesRequest request, CancellationToken cancellationToken) where T : ModelsBase
         {

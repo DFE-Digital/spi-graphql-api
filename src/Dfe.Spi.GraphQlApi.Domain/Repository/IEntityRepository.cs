@@ -10,5 +10,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Repository
         Task<EntityCollection<ManagementGroup>> LoadManagementGroupsAsync(LoadManagementGroupsRequest request, CancellationToken cancellationToken);
         Task<EntityCollection<Census>> LoadCensusAsync(LoadCensusRequest request, CancellationToken cancellationToken);
         Task<EntityCollection<LearningProviderRates>> LoadLearningProviderRatesAsync(LoadLearningProviderRatesRequest request, CancellationToken cancellationToken);
+        Task<EntityCollection<ManagementGroupRates>> LoadManagementGroupRatesAsync(LoadManagementGroupRatesRequest request, CancellationToken cancellationToken);
     }
 }
