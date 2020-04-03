@@ -7,7 +7,7 @@
         
         <PackageReference Include="Dfe.Spi.Common.Caching" Version="1.1.0" />
         
-        <PackageReference Include="Dfe.Spi.Common.Http.Server" Version="1.0.15" />
+        <PackageReference Include="Dfe.Spi.Common.Http.Server" Version="1.0.17" />
         
         <PackageReference Include="Dfe.Spi.Common.Logging" Version="1.1.1" />
         <PackageReference Include="Dfe.Spi.Common.Models" Version="1.0.5" />
