@@ -88,10 +88,29 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 },
                 CombinationOperator = "and",
                 Skip = 0,
-                Take = 1,
+                Take = 25,
             };
             var searchResults = await _registryProvider.SearchLearningProvidersAsync(searchRequest, cancellationToken);
-            var result = searchResults.Results.FirstOrDefault();
+            int CalculateOrder(SearchResult searchResult)
+            {
+                var status = searchResult.IndexedData?
+                    .SingleOrDefault(kvp => kvp.Key.Equals("Status", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
+                if (status != null && status.Equals("Open", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return 1;
+                }
+                return int.MaxValue;
+            };
+            var result = searchResults.Results
+                .Select(searchResult =>
+                    new
+                    {
+                        Result = searchResult,
+                        Order = CalculateOrder(searchResult),
+                    })
+                .OrderBy(orderedResult => orderedResult.Order)
+                .FirstOrDefault()?.Result;
             return result == null 
                 ? null 
                 : new AggregateEntityReference {AdapterRecordReferences = result.Entities};

@@ -68,7 +68,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             _registryProviderMock.Verify(b => b.SearchLearningProvidersAsync(
                     It.Is<SearchRequest>(r =>
                         r.Skip == 0 &&
-                        r.Take == 1 &&
+                        r.Take == 25 &&
                         r.Groups != null &&
                         r.Groups.Length == 1 &&
                         r.Groups[0].Filter != null &&
