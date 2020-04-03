@@ -148,6 +148,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<Application.GraphTypes.Census>();
             services.AddScoped<Application.GraphTypes.Aggregation>();
             services.AddScoped<Application.GraphTypes.ManagementGroup>();
+            services.AddScoped<Application.GraphTypes.PaginationDetails>();
+            services.AddScoped<Application.GraphTypes.LearningProvidersPaged>();
             services.AddScoped<Application.GraphTypes.LearningProvider>();
             services.AddScoped<Application.GraphTypes.LineageEntry>();
             services.AddScoped<Application.GraphTypes.LineageAlternativeEntry>();

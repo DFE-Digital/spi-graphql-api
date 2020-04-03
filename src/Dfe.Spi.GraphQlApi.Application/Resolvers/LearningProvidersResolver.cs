@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
@@ -13,7 +14,7 @@ using LearningProvider = Dfe.Spi.Models.Entities.LearningProvider;
 
 namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 {
-    public interface ILearningProvidersResolver : IResolver<LearningProvider[]>
+    public interface ILearningProvidersResolver : IResolver<LearningProvidersPagedModel>
     {
     }
 
@@ -33,16 +34,28 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             _logger = logger;
         }
 
-        public async Task<LearningProvider[]> ResolveAsync<T>(ResolveFieldContext<T> context)
+        public async Task<LearningProvidersPagedModel> ResolveAsync<T>(ResolveFieldContext<T> context)
         {
             try
             {
-                var references = await SearchAsync(context, context.CancellationToken);
+                var resultSet = await SearchAsync(context, context.CancellationToken);
+                var references = resultSet.Results.Select(d =>
+                        new AggregateEntityReference {AdapterRecordReferences = d.Entities})
+                    .ToArray();
 
                 var fields = GetRequestedFields(context);
                 var entities = await LoadAsync(references, fields, context.CancellationToken);
 
-                return entities;
+                return new LearningProvidersPagedModel
+                {
+                    Results = entities,
+                    Pagination = new PaginationDetailsModel
+                    {
+                        Skipped = resultSet.Skipped,
+                        Taken = resultSet.Taken,
+                        TotalNumberOfRecords = resultSet.TotalNumberOfRecords,
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -51,13 +64,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
         }
 
-        private async Task<AggregateEntityReference[]> SearchAsync<T>(ResolveFieldContext<T> context, CancellationToken cancellationToken)
+        private async Task<SearchResultSet> SearchAsync<T>(ResolveFieldContext<T> context, CancellationToken cancellationToken)
         {
             var searchRequest = GetSearchRequest(context);
             var searchResults = await _registryProvider.SearchLearningProvidersAsync(searchRequest, cancellationToken);
-            return searchResults.Results.Select(d =>
-                    new AggregateEntityReference {AdapterRecordReferences = d.Entities})
-                .ToArray();
+            return searchResults;
         }
 
         private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references, string[] fields,
