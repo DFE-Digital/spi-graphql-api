@@ -321,7 +321,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<StringGraphType> {Name = "type"},
                 }));
 
-            Field<Rates>("rates",
+            Field<LearningProviderRates>("rates",
                 resolve: learningProviderRatesResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {

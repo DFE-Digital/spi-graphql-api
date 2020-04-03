@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
@@ -44,7 +45,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                                 new EntityReference
                                 {
                                     SourceSystemId = entityId,
-                                    SourceSystemName = "Rates",
+                                    SourceSystemName = SourceSystemNames.Rates,
                                 },
                             }
                         },

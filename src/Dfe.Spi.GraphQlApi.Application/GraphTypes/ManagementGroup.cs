@@ -5,7 +5,9 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 {
     public class ManagementGroup : ObjectGraphType<Models.Entities.ManagementGroup>
     {
-        public ManagementGroup(ICensusResolver censusResolver)
+        public ManagementGroup(
+            ICensusResolver censusResolver,
+            IManagementGroupRatesResolver managementGroupRatesResolver)
         {
             Field(x => x.Name, nullable: true)
                 .Name("name")
@@ -29,6 +31,13 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 {
                     new QueryArgument<IntGraphType> {Name = "year"},
                     new QueryArgument<StringGraphType> {Name = "type"},
+                }));
+
+            Field<ManagementGroupRates>("rates",
+                resolve: managementGroupRatesResolver.ResolveAsync,
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<IntGraphType> {Name = "year"},
                 }));
         }
     }
