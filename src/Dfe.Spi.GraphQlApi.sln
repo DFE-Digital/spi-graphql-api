@@ -41,6 +41,7 @@ ProjectSection(SolutionItems) = preProject
 	..\eapim\name-values.csv = ..\eapim\name-values.csv
 	..\eapim\policy.xml = ..\eapim\policy.xml
 	..\eapim\swagger.json = ..\eapim\swagger.json
+	..\eapim\oauth.xml = ..\eapim\oauth.xml
 EndProjectSection
 EndProject
 Global
