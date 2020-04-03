@@ -32,7 +32,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<IntGraphType> { Name = "take" },
                 }));
 
-            Field<ListGraphType<ManagementGroup>>("managementGroups",
+            Field<ManagementGroupsPaged>("managementGroups",
                 resolve: managementGroupsResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
