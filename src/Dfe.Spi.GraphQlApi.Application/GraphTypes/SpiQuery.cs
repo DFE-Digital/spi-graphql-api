@@ -23,7 +23,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<StringGraphType> {Name = "dfeNumber"},
                 }));
 
-            Field<ListGraphType<LearningProvider>>("learningProviders",
+            Field<LearningProvidersPaged>("learningProviders",
                 resolve: learningProvidersResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
@@ -32,7 +32,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<IntGraphType> { Name = "take" },
                 }));
 
-            Field<ListGraphType<ManagementGroup>>("managementGroups",
+            Field<ManagementGroupsPaged>("managementGroups",
                 resolve: managementGroupsResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {

@@ -240,12 +240,41 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             var actual = await _resolver.ResolveAsync(context);
 
-            Assert.AreEqual(entities.Length, actual.Length);
+            Assert.IsNotNull(actual.Results);
+            Assert.AreEqual(entities.Length, actual.Results.Length);
             for (var i = 0; i < entities.Length; i++)
             {
-                Assert.AreSame(entities[i], actual[i],
-                    $"Expected {i} to be {entities[i]} but was {actual[i]}");
+                Assert.AreSame(entities[i], actual.Results[i],
+                    $"Expected {i} to be {entities[i]} but was {actual.Results[i]}");
             }
+        }
+
+        [Test, AutoData]
+        public async Task ThenItShouldReturnPaginationDetailsFromSearchResults(int skipped, int taken, int totalNumberOfRecords)
+        {
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = new[]
+                    {
+                        new SearchResult
+                        {
+                            Entities = new EntityReference[0],
+                        },
+                    },
+                    Skipped = skipped,
+                    Taken = taken,
+                    TotalNumberOfRecords = totalNumberOfRecords,
+                });
+            var context = BuildResolveFieldContext();
+
+            var actual = await _resolver.ResolveAsync(context);
+
+            Assert.IsNotNull(actual.Pagination);
+            Assert.AreEqual(skipped, actual.Pagination.Skipped);
+            Assert.AreEqual(taken, actual.Pagination.Taken);
+            Assert.AreEqual(totalNumberOfRecords, actual.Pagination.TotalNumberOfRecords);
         }
 
 
