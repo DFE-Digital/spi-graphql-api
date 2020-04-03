@@ -8,7 +8,8 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     {
         public SpiQuery(
             ILearningProviderResolver learningProviderResolver,
-            ILearningProvidersResolver learningProvidersResolver)
+            ILearningProvidersResolver learningProvidersResolver,
+            IManagementGroupsResolver managementGroupsResolver)
         {
             Field<LearningProvider>("learningProvider",
                 resolve: learningProviderResolver.ResolveAsync,
@@ -24,6 +25,15 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
 
             Field<ListGraphType<LearningProvider>>("learningProviders",
                 resolve: learningProvidersResolver.ResolveAsync,
+                arguments: new QueryArguments(new QueryArgument[]
+                {
+                    new QueryArgument<ComplexQuery> { Name = "criteria" },
+                    new QueryArgument<IntGraphType> { Name = "skip" },
+                    new QueryArgument<IntGraphType> { Name = "take" },
+                }));
+
+            Field<ListGraphType<ManagementGroup>>("managementGroups",
+                resolve: managementGroupsResolver.ResolveAsync,
                 arguments: new QueryArguments(new QueryArgument[]
                 {
                     new QueryArgument<ComplexQuery> { Name = "criteria" },

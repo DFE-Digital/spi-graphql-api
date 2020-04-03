@@ -46,25 +46,13 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
         public async Task<SearchResultSet> SearchLearningProvidersAsync(SearchRequest request, CancellationToken cancellationToken)
         {
             var resource = $"search/learning-providers";
-            _logger.Debug($"Searching {resource}");
+            return await SearchAsync(resource, request, cancellationToken);
+        }
 
-            var json = JsonConvert.SerializeObject(request);
-            
-            var httpRequest = new RestRequest(resource, Method.POST);
-            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
-            httpRequest.AddParameter(string.Empty, json, "application/json", ParameterType.RequestBody);
-            
-            var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
-            if (!response.IsSuccessful)
-            {
-                throw new RegistryApiException(resource, response.StatusCode, response.Content);
-            }
-            _logger.Debug($"Search response json from {resource} is ${response.Content}");
-
-            var resultset = JsonConvert.DeserializeObject<SearchResultSet>(response.Content);
-            _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(resultset)}");
-
-            return resultset;
+        public async Task<SearchResultSet> SearchManagementGroupsAsync(SearchRequest request, CancellationToken cancellationToken)
+        {
+            var resource = $"search/management-group";
+            return await SearchAsync(resource, request, cancellationToken);
         }
 
         public async Task<EntityReference[]> GetSynonymsAsync(string entityType, string sourceSystem, string sourceSystemId,
@@ -118,6 +106,31 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
             _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(results)}");
 
             return results.Links;
+        }
+
+
+        private async Task<SearchResultSet> SearchAsync(string resource, SearchRequest request, CancellationToken cancellationToken)
+        {
+            _logger.Debug($"Searching {resource}");
+
+            var json = JsonConvert.SerializeObject(request);
+            _logger.Debug($"Search request json going to {resource} is ${json}");
+            
+            var httpRequest = new RestRequest(resource, Method.POST);
+            httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
+            httpRequest.AddParameter(string.Empty, json, "application/json", ParameterType.RequestBody);
+            
+            var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                throw new RegistryApiException(resource, response.StatusCode, response.Content);
+            }
+            _logger.Debug($"Search response json from {resource} is ${response.Content}");
+
+            var resultset = JsonConvert.DeserializeObject<SearchResultSet>(response.Content);
+            _logger.Debug($"Deserialized response from {resource} to {JsonConvert.SerializeObject(resultset)}");
+
+            return resultset;
         }
     }
 }
