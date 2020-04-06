@@ -42,6 +42,8 @@ ProjectSection(SolutionItems) = preProject
 	..\eapim\oauth.xml = ..\eapim\oauth.xml
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi", "Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi\Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.csproj", "{16BE7832-AD1B-4B28-8F59-1DF41C0E19EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{762FADE7-946C-4206-BDB9-11DE9509DE22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{762FADE7-946C-4206-BDB9-11DE9509DE22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{762FADE7-946C-4206-BDB9-11DE9509DE22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16BE7832-AD1B-4B28-8F59-1DF41C0E19EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16BE7832-AD1B-4B28-8F59-1DF41C0E19EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16BE7832-AD1B-4B28-8F59-1DF41C0E19EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16BE7832-AD1B-4B28-8F59-1DF41C0E19EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{79CDCB7A-124A-4678-99B8-E87596DE6B12} = {974B2A5B-6100-49EF-960A-9A2E68FB5FCB}
