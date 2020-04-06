@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
+using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using ManagementGroup = Dfe.Spi.Models.Entities.ManagementGroup;
@@ -56,9 +58,16 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     }
                 };
             }
+            catch (InvalidRequestException ex)
+            {
+                _logger.Info($"Invalid request when resolving management groups - {ex.Message}", ex);
+                context.Errors.AddRange(
+                    ex.Details.Select(detailsMessage => new ExecutionError(detailsMessage)));
+                return null;
+            }
             catch (Exception ex)
             {
-                _logger.Error($"Error resolving learning providers", ex);
+                _logger.Error($"Error resolving management groups", ex);
                 throw;
             }
         }

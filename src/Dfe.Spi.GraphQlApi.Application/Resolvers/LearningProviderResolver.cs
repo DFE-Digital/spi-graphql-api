@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
@@ -53,6 +54,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 _logger.Info($"Request issue resolving learning provider", ex);
                 context.Errors.Add(new ExecutionError(ex.Message));
+                return null;
+            }
+            catch (InvalidRequestException ex)
+            {
+                _logger.Info($"Invalid request when resolving learning provider - {ex.Message}", ex);
+                context.Errors.AddRange(
+                    ex.Details.Select(detailsMessage => new ExecutionError(detailsMessage)));
                 return null;
             }
             catch (Exception ex)

@@ -6,6 +6,7 @@ using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.Http.Client;
+using Dfe.Spi.Common.Models;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
@@ -123,6 +124,26 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
             var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
             if (!response.IsSuccessful)
             {
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    HttpDetailedErrorBody detailedErrorBody = null;
+                    try
+                    {
+                        detailedErrorBody = JsonConvert.DeserializeObject<HttpDetailedErrorBody>(response.Content);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Warning($"Received bad request from registry at {resource} however body was not a valid HttpDetailedErrorBody - {ex.Message}", ex);
+                    }
+
+                    if (detailedErrorBody != null)
+                    {
+                        throw new InvalidRequestException(
+                            detailedErrorBody.Message,
+                            detailedErrorBody.ErrorIdentifier,
+                            detailedErrorBody.Details);
+                    }
+                }
                 throw new RegistryApiException(resource, response.StatusCode, response.Content);
             }
             _logger.Debug($"Search response json from {resource} is ${response.Content}");

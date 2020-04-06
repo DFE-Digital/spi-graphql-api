@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
+using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
+using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using LearningProvider = Dfe.Spi.Models.Entities.LearningProvider;
@@ -57,6 +59,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     }
                 };
             }
+            catch (InvalidRequestException ex)
+            {
+                _logger.Info($"Invalid request when resolving learning providers - {ex.Message}", ex);
+                context.Errors.AddRange(
+                    ex.Details.Select(detailsMessage => new ExecutionError(detailsMessage)));
+                return null;
+            }
             catch (Exception ex)
             {
                 _logger.Error($"Error resolving learning providers", ex);
@@ -103,7 +112,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     Operator = c.Operator,
                     Value = c.Value,
                 }).ToArray();
-                
+
                 searchGroups.Add(new SearchGroup
                 {
                     Filter = filters,
@@ -123,7 +132,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
         {
             var selections = context.FieldAst.SelectionSet.Selections.Select(x => ((Field) x).Name);
-            
+
             // Will need identifiers for resolving sub objects (such as management group), so request them from backend
             selections = selections.Concat(new[] {"urn", "ukprn"}).Distinct();
 
