@@ -61,7 +61,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
             catch (InvalidRequestException ex)
             {
-                _logger.Info($"Invalid request when resolving learning providers - {ex.Message}", ex);
+                _logger.Info($"Invalid request when resolving learning providers - {ex.ErrorIdentifier} - {ex.Message}", ex);
                 context.Errors.AddRange(
                     ex.Details.Select(detailsMessage => new ExecutionError(detailsMessage)));
                 return null;
