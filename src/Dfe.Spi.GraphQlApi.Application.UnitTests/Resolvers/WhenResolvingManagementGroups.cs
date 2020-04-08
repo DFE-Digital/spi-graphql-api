@@ -11,6 +11,7 @@ using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Moq;
 using NUnit.Framework;
@@ -373,7 +374,24 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                 arguments.Add("take", take.Value);
             }
             
-            return TestHelper.BuildResolveFieldContext<object>(arguments: arguments, fields: fields);
+            var context = TestHelper.BuildResolveFieldContext<object>(arguments: arguments, fields: new[] {"results", "_pagination"});
+            
+            var resultsField = (Field)context.FieldAst.SelectionSet.Selections
+                .Single(x => ((Field) x).Name.Equals("results", StringComparison.InvariantCultureIgnoreCase));
+            if (resultsField.SelectionSet == null)
+            {
+                resultsField.SelectionSet = new SelectionSet();
+            }
+
+            if (fields != null)
+            {
+                foreach (var field in fields)
+                {
+                    resultsField.SelectionSet.Add(new Field(null, new NameNode(field)));
+                }
+            }
+
+            return context;
         }
     }
 }
