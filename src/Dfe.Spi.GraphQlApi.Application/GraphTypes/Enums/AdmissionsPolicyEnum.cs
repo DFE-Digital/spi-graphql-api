@@ -4,14 +4,14 @@ using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums
 {
-    public class BoardersCodeEnum : EnumerationGraphType
+    public class AdmissionsPolicyEnum : EnumerationGraphType
     {
-        public BoardersCodeEnum(IEnumerationLoader enumerationLoader)
+        public AdmissionsPolicyEnum(IEnumerationLoader enumerationLoader)
         {
             Name = "BoardersCode";
             Description = "Boarders Code";
 
-            var values = enumerationLoader.GetEnumerationValues(EnumerationNames.BoardersCode);
+            var values = enumerationLoader.GetEnumerationValues(EnumerationNames.AdmissionsPolicy);
             foreach (var value in values)
             {
                 AddValue(value);

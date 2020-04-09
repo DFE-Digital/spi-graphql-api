@@ -128,13 +128,11 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
             
             // enums
-            services.AddScoped<BoardersCodeEnum>();
+            services.AddScoped<AdmissionsPolicyEnum>();
             services.AddScoped<CensusAggregationFieldsEnum>();
-            services.AddScoped<LearningProviderGenderOfEntryEnum>();
             services.AddScoped<LearningProviderStatusEnum>();
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
-            services.AddScoped<LocalAuthorityCodeEnum>();
             services.AddScoped<OperatorEnum>();
             
             // inputs
