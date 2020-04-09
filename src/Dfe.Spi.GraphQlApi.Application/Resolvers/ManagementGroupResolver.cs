@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
+using GraphQL;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -19,32 +21,50 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         private readonly IRegistryProvider _registryProvider;
         private readonly IEntityRepository _entityRepository;
+        private readonly ILoggerWrapper _logger;
 
         public ManagementGroupResolver(
             IRegistryProvider registryProvider,
-            IEntityRepository entityRepository)
+            IEntityRepository entityRepository,
+            ILoggerWrapper logger)
         {
             _registryProvider = registryProvider;
             _entityRepository = entityRepository;
+            _logger = logger;
         }
         
         public async Task<Models.Entities.ManagementGroup> ResolveAsync<TContext>(ResolveFieldContext<TContext> context)
         {
-            if (context.Source is Models.Entities.LearningProvider learningProvider)
+            try
             {
-                var managementGroupReference = await GetEntityReferenceAsync(learningProvider, context.CancellationToken);
-                if (managementGroupReference == null)
+                if (context.Source is Models.Entities.LearningProvider learningProvider)
                 {
-                    return null;
+                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, context.CancellationToken);
+                    if (managementGroupReference == null)
+                    {
+                        return null;
+                    }
+
+                    var fields = GetRequestedFields(context);
+                    var managementGroup =
+                        await GetManagementGroup(managementGroupReference, fields, context.CancellationToken);
+                    return managementGroup;
                 }
 
-                var fields = GetRequestedFields(context);
-                var managementGroup =
-                    await GetManagementGroup(managementGroupReference, fields, context.CancellationToken);
-                return managementGroup;
+                return null;
             }
-            
-            return null;
+            catch (InvalidRequestException ex)
+            {
+                _logger.Info($"Invalid request when resolving management group - {ex.ErrorIdentifier} - {ex.Message}", ex);
+                context.Errors.AddRange(
+                    ex.Details.Select(detailsMessage => new ExecutionError(detailsMessage)));
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error resolving management group", ex);
+                throw;
+            }
         }
 
         private async Task<EntityReference> GetEntityReferenceAsync(LearningProvider learningProvider, CancellationToken cancellationToken)

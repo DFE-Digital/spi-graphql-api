@@ -131,7 +131,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
         }
 
         [Test]
-        public async Task ThenItShouldThrowExceptionIfApiRequestNotSuccessful()
+        public void ThenItShouldThrowExceptionIfApiRequestNotSuccessful()
         {
             _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
                 .ReturnsAsync(new RestResponse

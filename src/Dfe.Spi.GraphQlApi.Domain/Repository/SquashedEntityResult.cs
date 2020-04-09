@@ -1,5 +1,5 @@
 using Dfe.Spi.GraphQlApi.Domain.Common;
-using Dfe.Spi.Models;
+using ModelsBase = Dfe.Spi.Models.ModelsBase;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Repository
 {
@@ -7,6 +7,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Repository
     {
         public AggregateEntityReference EntityReference { get; set; }
         public T SquashedEntity { get; set; }
-        public object[] EntityAdapterErrorDetails { get; set; }
+        public EntityAdapterError[] EntityAdapterErrorDetails { get; set; }
     }
 }
