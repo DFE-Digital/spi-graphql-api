@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Context.Definitions;
 using Dfe.Spi.Common.Http;
 using Dfe.Spi.Common.Http.Client;
 using Dfe.Spi.Common.Logging.Definitions;
+using Dfe.Spi.Common.Models;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
-using Dfe.Spi.Models;
 using Dfe.Spi.Models.Entities;
 using Newtonsoft.Json;
 using RestSharp;
+using ModelsBase = Dfe.Spi.Models.ModelsBase;
 
 namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
 {
@@ -100,6 +102,27 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
             httpRequest.AppendContext(_executionContextManager.SpiExecutionContext);
 
             var response = await _restClient.ExecuteTaskAsync(httpRequest, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                try
+                {
+                    var errorBody = JsonConvert.DeserializeObject<HttpErrorBody>(response.Content);
+                    if (errorBody.ErrorIdentifier == "SPI-ESQ-6")
+                    {
+                        return new EntityCollection<T>
+                        {
+                            SquashedEntityResults = request.EntityReferences?.Select(x =>
+                                new SquashedEntityResult<T>()).ToArray(),
+                        };
+                    }
+                    
+                    _logger.Warning($"Received 404, but ErrorIdentifier was not expected. Expected SPI-ESQ-6, Received {errorBody.ErrorIdentifier} (message: {errorBody.Message}");
+                }
+                catch(Exception ex)
+                {
+                    _logger.Warning($"Received 404, but was unable to process error body - {ex.Message}", ex);
+                }
+            }
             if (!response.IsSuccessful)
             {
                 throw new SquasherApiException(resource, response.StatusCode, response.Content);
