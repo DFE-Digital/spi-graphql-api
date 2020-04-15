@@ -49,19 +49,5 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                     $"Expected {i} to have value {values[i]} but got {actual[i].Value}");
             }
         }
-
-        [Test, AutoData]
-        public void ThenItShouldFixValueFromName(string enumName)
-        {
-            _enumerationRepositoryMock.Setup(r =>
-                    r.GetEnumerationValuesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new []{"Some Value 12-16's"});
-
-            var actual = _loader.GetEnumerationValues(enumName);
-
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(1, actual.Length);
-            Assert.AreEqual("SomeValue12to16s", actual[0].Name);
-        }
     }
 }
