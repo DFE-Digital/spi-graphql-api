@@ -13,24 +13,6 @@
         "operationId": "get-query",
         "parameters": [
           {
-            "in": "query",
-            "name": "schema",
-            "description": "Flag whether to show schema or not",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "query",
-            "description": "GraphQL query to run",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "in": "header",
             "name": "Authorization",
             "description": "Bearer token authentication.",
