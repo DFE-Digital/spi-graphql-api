@@ -8,6 +8,39 @@
   "host": "__function_app_host__",
   "paths": {
     "/graphql": {
+      "get": {
+        "description": "Get schema or run query on get",
+        "operationId": "get-query",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "Bearer token authentication.",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "X-External-Request-Id",
+            "description": "An optional external request id. Used in logging.",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The squashing was a success.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "500": {
+            "description": "There was a problem with the request - and this could be different things depending on the context. See body of response for more detail.",
+            "schema": {
+              "$ref": "#/definitions/http-error-body"
+            }
+          }
+        }
+      },
       "post": {
         "description": "Send query",
         "operationId": "json-query",
