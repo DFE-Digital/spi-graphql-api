@@ -67,13 +67,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private string BuildEntityId<TContext>(ResolveFieldContext<TContext> context)
         {
             var sourceManagementGroup = context.Source as ManagementGroup;
-            if (!(sourceManagementGroup?.Code?.StartsWith("Local authority-") ?? false))
+            if (!(sourceManagementGroup?.Code?.StartsWith("LocalAuthority-") ?? false))
             {
                 return null;
             }
             
             var year = context.Arguments["year"];
-            var laCode = sourceManagementGroup.Code.Substring(16);
+            var laCode = sourceManagementGroup.Code.Substring(15);
 
             return $"{year}-{laCode}";
         }
