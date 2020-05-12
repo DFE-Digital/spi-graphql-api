@@ -24,6 +24,38 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             Field(x => x.Identifier, nullable: true)
                 .Name("identifier")
                 .Description("Identifier");
+            
+            Field(x => x.CompaniesHouseNumber, nullable: true)
+                .Name("companiesHouseNumber")
+                .Description("Companies House Number");
+            
+            Field(x => x.Ukprn, nullable: true)
+                .Name("ukprn")
+                .Description("Ukprn");
+            
+            Field(x => x.AddressLine1, nullable: true)
+                .Name("addressLine1")
+                .Description("Address Line 1");
+            
+            Field(x => x.AddressLine2, nullable: true)
+                .Name("addressLine2")
+                .Description("Address Line 2");
+            
+            Field(x => x.AddressLine3, nullable: true)
+                .Name("addressLine3")
+                .Description("Address Line 3");
+            
+            Field(x => x.Town, nullable: true)
+                .Name("town")
+                .Description("Town");
+            
+            Field(x => x.County, nullable: true)
+                .Name("county")
+                .Description("County");
+            
+            Field(x => x.Postcode, nullable: true)
+                .Name("postcode")
+                .Description("Postcode");
 
             Field<Census>("census",
                 resolve: censusResolver.ResolveAsync,
