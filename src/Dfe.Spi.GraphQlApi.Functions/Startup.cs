@@ -12,6 +12,7 @@ using Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
+using Dfe.Spi.GraphQlApi.Domain.Context;
 using Dfe.Spi.GraphQlApi.Domain.Enumerations;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
@@ -88,7 +89,9 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<ILogger>(provider =>
                 provider.GetService<ILoggerFactory>().CreateLogger(LogCategories.CreateFunctionUserCategory("GraphQl")));
 
-            services.AddScoped<IHttpSpiExecutionContextManager, HttpSpiExecutionContextManager>();
+            services.AddScoped<IGraphExecutionContextManager, HttpGraphExecutionContextManager>();
+            services.AddScoped<IHttpSpiExecutionContextManager>((provider) =>
+                (IHttpSpiExecutionContextManager) provider.GetService(typeof(IGraphExecutionContextManager)));
             services.AddScoped<ISpiExecutionContextManager>((provider) =>
                 (ISpiExecutionContextManager) provider.GetService(typeof(IHttpSpiExecutionContextManager)));
             services.AddScoped<ILoggerWrapper, LoggerWrapper>();

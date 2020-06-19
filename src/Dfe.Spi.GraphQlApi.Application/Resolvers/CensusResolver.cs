@@ -8,6 +8,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.Models;
 using Dfe.Spi.Common.WellKnownIdentifiers;
 using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Context;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
@@ -26,6 +27,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
         private readonly IEntityRepository _entityRepository;
         private readonly IRegistryProvider _registryProvider;
+        private readonly IGraphExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
         static CensusResolver()
@@ -42,10 +44,12 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         public CensusResolver(
             IEntityRepository entityRepository,
             IRegistryProvider registryProvider,
+            IGraphExecutionContextManager executionContextManager,
             ILoggerWrapper logger)
         {
             _entityRepository = entityRepository;
             _registryProvider = registryProvider;
+            _executionContextManager = executionContextManager;
             _logger = logger;
         }
 
@@ -125,6 +129,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     },
                 },
                 AggregatesRequest = aggregationRequest,
+                Live = _executionContextManager.GraphExecutionContext.QueryLive,
             };
             var censuses = await _entityRepository.LoadCensusAsync(request, context.CancellationToken);
             return censuses.SquashedEntityResults.FirstOrDefault()?.SquashedEntity;

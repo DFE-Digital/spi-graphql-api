@@ -8,5 +8,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Repository
         public AggregateEntityReference[] EntityReferences { get; set; }
         public string[] Fields { get; set; }
         public AggregatesRequest AggregatesRequest { get; set; }
+        public bool Live { get; set; }
     }
 }

@@ -8,5 +8,6 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi
         public SquasherEntityReference[] EntityReferences { get; set; }
         public string[] Fields { get; set; }
         public AggregatesRequest AggregatesRequest { get; set; }
+        public bool Live { get; set; }
     }
 }
