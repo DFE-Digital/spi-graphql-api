@@ -7,6 +7,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
 using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Context;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using GraphQL;
@@ -23,15 +24,18 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         private readonly IEntityRepository _entityRepository;
         private readonly IRegistryProvider _registryProvider;
+        private readonly IGraphExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
         public ManagementGroupsResolver(
             IEntityRepository entityRepository,
             IRegistryProvider registryProvider,
+            IGraphExecutionContextManager executionContextManager,
             ILoggerWrapper logger)
         {
             _entityRepository = entityRepository;
             _registryProvider = registryProvider;
+            _executionContextManager = executionContextManager;
             _logger = logger;
         }
         
@@ -86,6 +90,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 EntityReferences = references,
                 Fields = fields,
+                Live = _executionContextManager.GraphExecutionContext.QueryLive,
             };
             var loadResult = await _entityRepository.LoadManagementGroupsAsync(request, cancellationToken);
 

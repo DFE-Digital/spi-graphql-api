@@ -8,6 +8,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.UnitTesting.Fixtures;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Common;
+using Dfe.Spi.GraphQlApi.Domain.Context;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
@@ -22,6 +23,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
     {
         private Mock<IEntityRepository> _entityRepositoryMock;
         private Mock<IRegistryProvider> _registryProviderMock;
+        private Mock<IGraphExecutionContextManager> _executionContextManagerMock;
         private Mock<ILoggerWrapper> _loggerMock;
         private ManagementGroupsResolver _resolver;
 
@@ -50,12 +52,17 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         },
                     }
                 });
+            
+            _executionContextManagerMock = new Mock<IGraphExecutionContextManager>();
+            _executionContextManagerMock.Setup(m => m.GraphExecutionContext)
+                .Returns(new GraphExecutionContext());
 
             _loggerMock = new Mock<ILoggerWrapper>();
 
             _resolver = new ManagementGroupsResolver(
                 _entityRepositoryMock.Object,
                 _registryProviderMock.Object,
+                _executionContextManagerMock.Object,
                 _loggerMock.Object);
         }
 
