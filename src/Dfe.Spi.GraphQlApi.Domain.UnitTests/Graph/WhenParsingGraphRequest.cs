@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoFixture;
 using AutoFixture.NUnit3;
 using Dfe.Spi.GraphQlApi.Domain.Graph;
 using Newtonsoft.Json;
@@ -10,24 +13,27 @@ namespace Dfe.Spi.GraphQlApi.Domain.UnitTests.Graph
     {
         private const string JsonMimeType = "application/json";
         private const string GraphQLMimeType = "application/graphql";
-        
+
         [Test, AutoData]
         public void ThenItShouldReturnGraphRequestForJsonMimeType(GraphRequest request)
         {
             var value = JsonConvert.SerializeObject(request);
-            
+
             var actual = GraphRequest.Parse(value, JsonMimeType);
-            
+
             Assert.IsNotNull(actual);
         }
-        
+
         [Test, AutoData]
-        public void ThenItShouldDeserializeValueForJsonMimeType(GraphRequest request)
+        public void ThenItShouldDeserializeValueForJsonMimeType(GraphRequest request, Dictionary<string, string> variables)
         {
+            request.Variables = variables
+                .Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value))
+                .ToDictionary(x => x.Key, x => x.Value);
             var value = JsonConvert.SerializeObject(request);
-            
+
             var actual = GraphRequest.Parse(value, JsonMimeType);
-            
+
             Assert.AreEqual(request.Query, actual.Query);
             Assert.AreEqual(request.OperationName, actual.OperationName);
             Assert.AreEqual(request.Variables.Count, actual.Variables.Count);
@@ -39,20 +45,20 @@ namespace Dfe.Spi.GraphQlApi.Domain.UnitTests.Graph
                     $"Expected Variable[{key}] to be {request.Variables[key]}, but was {actual.Variables[key]}");
             }
         }
-        
+
         [Test, AutoData]
         public void ThenItShouldReturnGraphRequestForJGraphQLMimeType(string value)
         {
             var actual = GraphRequest.Parse(value, GraphQLMimeType);
-            
+
             Assert.IsNotNull(actual);
         }
-        
+
         [Test, AutoData]
         public void ThenItShouldAssignValueToGraphRequestsQuery(string value)
         {
             var actual = GraphRequest.Parse(value, GraphQLMimeType);
-            
+
             Assert.AreEqual(value, actual.Query);
         }
 
