@@ -8,7 +8,7 @@
             <value>{{graph-function-app-key}}</value>
         </set-header>
 
-        <rate-limit calls="30" renewal-period="60" />
+        <rate-limit calls="300" renewal-period="60" />
 
     </inbound>
 
