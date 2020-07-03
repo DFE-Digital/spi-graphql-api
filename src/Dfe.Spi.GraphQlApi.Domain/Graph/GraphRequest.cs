@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Dfe.Spi.GraphQlApi.Domain.Graph
 {
@@ -8,7 +9,8 @@ namespace Dfe.Spi.GraphQlApi.Domain.Graph
     {
         public string Query { get; set; }
         public string OperationName { get; set; }
-        public Dictionary<string, object> Variables { get; set; }
+        public JObject Variables { get; set; }
+        // public Dictionary<string, object> Variables { get; set; }
 
         public static GraphRequest Parse(string value, string valueMimeType = "application/json")
         {
