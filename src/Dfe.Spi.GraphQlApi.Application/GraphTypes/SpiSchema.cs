@@ -24,7 +24,8 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             var result = await this.ExecuteAsync(_ =>
             {
                 _.Query = request.Query;
-                _.Inputs = request.Variables != null ? new GraphQL.Inputs(request.Variables) : null;
+                _.Inputs = request.Variables.ToInputs();
+                // _.Inputs = request.Variables != null ? new GraphQL.Inputs(request.Variables) : null;
             });
             _logger.Info($"Got query result {result}");
 

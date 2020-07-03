@@ -5,6 +5,7 @@ using AutoFixture;
 using AutoFixture.NUnit3;
 using Dfe.Spi.GraphQlApi.Domain.Graph;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Dfe.Spi.GraphQlApi.Domain.UnitTests.Graph
@@ -27,9 +28,7 @@ namespace Dfe.Spi.GraphQlApi.Domain.UnitTests.Graph
         [Test, AutoData]
         public void ThenItShouldDeserializeValueForJsonMimeType(GraphRequest request, Dictionary<string, string> variables)
         {
-            request.Variables = variables
-                .Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value))
-                .ToDictionary(x => x.Key, x => x.Value);
+            request.Variables = JObject.Parse(JsonConvert.SerializeObject(variables));
             var value = JsonConvert.SerializeObject(request);
 
             var actual = GraphRequest.Parse(value, JsonMimeType);
@@ -37,7 +36,7 @@ namespace Dfe.Spi.GraphQlApi.Domain.UnitTests.Graph
             Assert.AreEqual(request.Query, actual.Query);
             Assert.AreEqual(request.OperationName, actual.OperationName);
             Assert.AreEqual(request.Variables.Count, actual.Variables.Count);
-            foreach (var key in request.Variables.Keys)
+            foreach (var key in variables.Keys)
             {
                 Assert.IsTrue(actual.Variables.ContainsKey(key),
                     $"Expected Variables to contain key {key}, but was not found");
