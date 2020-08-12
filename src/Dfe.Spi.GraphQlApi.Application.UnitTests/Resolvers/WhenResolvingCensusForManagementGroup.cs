@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -88,7 +89,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             LearningProvider learningProvider1, LearningProvider learningProvider2)
         {
             _registryProviderMock.Setup(reg => reg.GetLinksAsync(
-                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new[]
                 {
                     new EntityLinkReference
@@ -130,7 +131,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
            await _censusResolver.ResolveAsync(context);
            
            _registryProviderMock.Verify(reg=>reg.GetLinksAsync(
-               "management-groups", SourceSystemNames.GetInformationAboutSchools, source.Code, _cancellationToken),
+               "management-groups", SourceSystemNames.GetInformationAboutSchools, source.Code, null, _cancellationToken),
                Times.Once);
         }
 

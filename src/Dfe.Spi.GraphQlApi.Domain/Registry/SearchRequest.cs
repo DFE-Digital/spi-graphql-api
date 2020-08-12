@@ -1,3 +1,5 @@
+using System;
+
 namespace Dfe.Spi.GraphQlApi.Domain.Registry
 {
     public class SearchRequest
@@ -6,5 +8,6 @@ namespace Dfe.Spi.GraphQlApi.Domain.Registry
         public string CombinationOperator { get; set; }
         public int Skip { get; set; }
         public int Take { get; set; }
+        public DateTime? PointInTime { get; set; }
     }
 }

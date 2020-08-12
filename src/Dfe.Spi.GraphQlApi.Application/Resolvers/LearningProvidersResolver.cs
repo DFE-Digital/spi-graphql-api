@@ -50,7 +50,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     .ToArray();
 
                 var fields = GetRequestedFields(context);
-                var entities = await LoadAsync(references, fields, context.CancellationToken);
+                var entities = await LoadAsync(references, context.Arguments, fields, context.CancellationToken);
 
                 return new LearningProvidersPagedModel
                 {
@@ -84,7 +84,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             return searchResults;
         }
 
-        private async Task<LearningProvider[]> LoadAsync(AggregateEntityReference[] references, string[] fields,
+        private async Task<LearningProvider[]> LoadAsync(
+            AggregateEntityReference[] references, 
+            Dictionary<string, object> arguments,
+            string[] fields,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest
@@ -92,6 +95,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 EntityReferences = references,
                 Fields = fields,
                 Live = _executionContextManager.GraphExecutionContext.QueryLive,
+                PointInTime = arguments.SingleOrDefault(kvp => kvp.Key == "pointInTime").Value as DateTime?,
             };
             var loadResult = await _entityRepository.LoadLearningProvidersAsync(request, cancellationToken);
 
@@ -107,6 +111,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             var take = context.HasArgument("take")
                 ? (int) context.Arguments["take"]
                 : 50;
+            var pointInTime = context.GetPointInTimeArgument();
 
             var searchGroups = new List<SearchGroup>();
             foreach (var @group in criteria.Groups)
@@ -131,6 +136,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 CombinationOperator = criteria.IsOr ? "or" : "and",
                 Skip = skip,
                 Take = take,
+                PointInTime = pointInTime,
             };
         }
 

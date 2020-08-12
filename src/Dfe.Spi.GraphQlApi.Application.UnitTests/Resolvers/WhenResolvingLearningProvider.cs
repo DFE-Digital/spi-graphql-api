@@ -51,7 +51,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         },
                     }
                 });
-            
+
             _executionContextManagerMock = new Mock<IGraphExecutionContextManager>();
             _executionContextManagerMock.Setup(m => m.GraphExecutionContext)
                 .Returns(new GraphExecutionContext());
@@ -148,6 +148,33 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
                         r.Fields[0] == "urn" &&
                         r.Fields[1] == "ukprn" &&
                         r.Fields[2] == "name"),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task ThenItShouldUseRequestedPointIntimeWhenGettingReferencedEntities(
+            AggregateEntityReference reference, DateTime pointInTime)
+        {
+            _registryProviderMock.Setup(r =>
+                    r.SearchLearningProvidersAsync(It.IsAny<SearchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchResultSet
+                {
+                    Results = new[]
+                    {
+                        new SearchResult
+                        {
+                            Entities = reference.AdapterRecordReferences,
+                        },
+                    }
+                });
+            var context = BuildResolveFieldContext(pointInTime: pointInTime);
+
+            await _resolver.ResolveAsync(context);
+
+            _entityRepositoryMock.Verify(er => er.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(r =>
+                        r.PointInTime == pointInTime),
                     context.CancellationToken),
                 Times.Once);
         }
@@ -251,28 +278,50 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
 
             Assert.IsNotNull(context.Errors);
             Assert.AreEqual(1, context.Errors.Count);
-            Assert.AreEqual("Must provide one argument", context.Errors[0].Message);
+            Assert.AreEqual("Must provide one identifier argument", context.Errors[0].Message);
         }
 
         [Test]
-        public async Task ThenItShouldSetErrorOnContextIfMoreThanOneArgumentsProvided()
+        public async Task ThenItShouldSetErrorOnContextIfOnlyPointInTimeArgumentsProvided()
         {
             var context = TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
             {
-                {"urn", "12345678"},
-                {"dfeNumber", "123/4567"},
+                {"pointInTime", DateTime.Today},
             });
 
             await _resolver.ResolveAsync(context);
 
             Assert.IsNotNull(context.Errors);
             Assert.AreEqual(1, context.Errors.Count);
-            Assert.AreEqual("Must provide one argument", context.Errors[0].Message);
+            Assert.AreEqual("Must provide one identifier argument", context.Errors[0].Message);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task ThenItShouldSetErrorOnContextIfMoreThanOneIdentifierArgumentProvided(bool includePointInTime)
+        {
+            var arguments = new Dictionary<string, object>
+            {
+                {"urn", "12345678"},
+                {"dfeNumber", "123/4567"},
+            };
+            if (includePointInTime)
+            {
+                arguments.Add("pointInTime", DateTime.Today);
+            }
+
+            var context = TestHelper.BuildResolveFieldContext<object>(arguments: arguments);
+
+            await _resolver.ResolveAsync(context);
+
+            Assert.IsNotNull(context.Errors);
+            Assert.AreEqual(1, context.Errors.Count);
+            Assert.AreEqual("Must provide one identifier argument", context.Errors[0].Message);
         }
 
         [Test]
         public void ThenItShouldThrowExceptionIfRepositoryThrowException()
-        {   
+        {
             var ex = new Exception("Unit test error");
             _entityRepositoryMock.Setup(r =>
                     r.LoadLearningProvidersAsync(It.IsAny<LoadLearningProvidersRequest>(),
@@ -286,12 +335,18 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<object> BuildResolveFieldContext(string urn = null, string[] fields = null)
+        private ResolveFieldContext<object> BuildResolveFieldContext(string urn = null, string[] fields = null, DateTime? pointInTime = null)
         {
-            return TestHelper.BuildResolveFieldContext<object>(arguments: new Dictionary<string, object>
+            var arguments = new Dictionary<string, object>
             {
                 {"urn", urn ?? TestHelper.RandomInt(10000000, 99999999).ToString()},
-            }, fields: fields);
+            };
+            if (pointInTime.HasValue)
+            {
+                arguments.Add("pointInTime", pointInTime);
+            }
+
+            return TestHelper.BuildResolveFieldContext<object>(arguments, fields);
         }
     }
 }

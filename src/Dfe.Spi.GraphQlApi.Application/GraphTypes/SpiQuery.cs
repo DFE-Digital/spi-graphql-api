@@ -21,6 +21,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<StringGraphType> {Name = "companiesHouseNumber"},
                     new QueryArgument<StringGraphType> {Name = "charitiesCommissionNumber"},
                     new QueryArgument<StringGraphType> {Name = "dfeNumber"},
+                    new QueryArgument<DateGraphType> {Name = "pointInTime"},
                 }));
 
             Field<LearningProvidersPaged>("learningProviders",
@@ -30,6 +31,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<ComplexQuery> { Name = "criteria" },
                     new QueryArgument<IntGraphType> { Name = "skip" },
                     new QueryArgument<IntGraphType> { Name = "take" },
+                    new QueryArgument<DateGraphType> {Name = "pointInTime"},
                 }));
 
             Field<ManagementGroupsPaged>("managementGroups",
@@ -39,6 +41,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                     new QueryArgument<ComplexQuery> { Name = "criteria" },
                     new QueryArgument<IntGraphType> { Name = "skip" },
                     new QueryArgument<IntGraphType> { Name = "take" },
+                    new QueryArgument<DateGraphType> {Name = "pointInTime"},
                 }));
         }
     }

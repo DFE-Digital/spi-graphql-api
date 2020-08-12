@@ -47,10 +47,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 {
                     return null;
                 }
+
                 _logger.Info($"Found reference {reference}");
 
                 var fields = GetRequestedFields(context);
-                var entity = await LoadAsync(reference, fields, context.CancellationToken);
+                var entity = await LoadAsync(reference, context.Arguments, fields, context.CancellationToken);
 
                 return entity;
             }
@@ -78,6 +79,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             CancellationToken cancellationToken)
         {
             var filters = arguments
+                .Where(kvp => kvp.Key != "pointInTime")
                 .Select(kvp => new SearchFilter
                 {
                     Field = kvp.Key,
@@ -85,7 +87,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 }).ToList();
             if (filters.Count != 1)
             {
-                throw new ResolverException("Must provide one argument");
+                throw new ResolverException("Must provide one identifier argument");
             }
 
             var searchRequest = new SearchRequest
@@ -101,8 +103,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 CombinationOperator = "and",
                 Skip = 0,
                 Take = 25,
+                PointInTime = arguments.GetPointInTimeArgument(),
             };
             var searchResults = await _registryProvider.SearchLearningProvidersAsync(searchRequest, cancellationToken);
+
             int CalculateOrder(SearchResult searchResult)
             {
                 var status = searchResult.IndexedData?
@@ -112,8 +116,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 {
                     return 1;
                 }
+
                 return int.MaxValue;
-            };
+            }
+
+            ;
             var result = searchResults.Results
                 .Select(searchResult =>
                     new
@@ -123,12 +130,15 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                     })
                 .OrderBy(orderedResult => orderedResult.Order)
                 .FirstOrDefault()?.Result;
-            return result == null 
-                ? null 
+            return result == null
+                ? null
                 : new AggregateEntityReference {AdapterRecordReferences = result.Entities};
         }
 
-        private async Task<LearningProvider> LoadAsync(AggregateEntityReference reference, string[] fields,
+        private async Task<LearningProvider> LoadAsync(
+            AggregateEntityReference reference,
+            Dictionary<string, object> arguments,
+            string[] fields,
             CancellationToken cancellationToken)
         {
             var request = new LoadLearningProvidersRequest
@@ -136,6 +146,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 EntityReferences = new[] {reference},
                 Fields = fields,
                 Live = _executionContextManager.GraphExecutionContext.QueryLive,
+                PointInTime = arguments.GetPointInTimeArgument(),
             };
             var loadResult = await _entityRepository.LoadLearningProvidersAsync(request, cancellationToken);
 
@@ -145,10 +156,10 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
         {
             var selections = context.FieldAst.SelectionSet.Selections.Select(x => ((Field) x).Name);
-            
+
             // Will need identifiers for resolving sub objects (such as management group), so request them from backend
             selections = selections.Concat(new[] {"urn", "ukprn"}).Distinct();
-            
+
             return selections.ToArray();
         }
     }
