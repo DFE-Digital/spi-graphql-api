@@ -86,6 +86,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                     }).ToArray(),
                 Fields = request.Fields,
                 Live = request.Live,
+                PointInTime = request.PointInTime,
             };
             Func<Parameter, bool> isExpectedBody = (body) =>
                 body != null &&
