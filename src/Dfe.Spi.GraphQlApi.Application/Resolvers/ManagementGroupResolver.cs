@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
@@ -43,7 +44,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 if (context.Source is Models.Entities.LearningProvider learningProvider)
                 {
-                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, context.CancellationToken);
+                    var pointInTime = GetPointInTime(context);
+                    
+                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, pointInTime, context.CancellationToken);
                     if (managementGroupReference == null)
                     {
                         return null;
@@ -51,7 +54,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
                     var fields = GetRequestedFields(context);
                     var managementGroup =
-                        await GetManagementGroup(managementGroupReference, fields, context.CancellationToken);
+                        await GetManagementGroup(managementGroupReference, fields, pointInTime, context.CancellationToken);
                     return managementGroup;
                 }
 
@@ -71,7 +74,24 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
         }
 
-        private async Task<EntityReference> GetEntityReferenceAsync(LearningProvider learningProvider, CancellationToken cancellationToken)
+        private DateTime? GetPointInTime<TContext>(ResolveFieldContext<TContext> context)
+        {
+            if (context.HasArgument("pointInTime"))
+            {
+                return context.GetPointInTimeArgument();
+            }
+
+            var parent = context.Document.GetParentOf(context.FieldAst);
+            if (parent == null)
+            {
+                return null;
+            }
+
+            return parent.Arguments.GetPointInTimeArgument();
+        }
+
+
+        private async Task<EntityReference> GetEntityReferenceAsync(LearningProvider learningProvider, DateTime? pointInTime, CancellationToken cancellationToken)
         {
             string sourceSystemName;
             string sourceSystemId;
@@ -90,13 +110,13 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 return null;
             }
             
-            var links = await _registryProvider.GetLinksAsync("learning-providers", sourceSystemName, sourceSystemId, cancellationToken);
+            var links = await _registryProvider.GetLinksAsync("learning-providers", sourceSystemName, sourceSystemId, pointInTime, cancellationToken);
             var managementGroupLink = links?.FirstOrDefault(l =>
                 l.LinkType.Equals("ManagementGroup", StringComparison.InvariantCultureIgnoreCase));
             return managementGroupLink;
         }
 
-        private async Task<ManagementGroup> GetManagementGroup(EntityReference managementGroupReference, string[] fields,
+        private async Task<ManagementGroup> GetManagementGroup(EntityReference managementGroupReference, string[] fields, DateTime? pointInTime,
             CancellationToken cancellationToken)
         {
             var request = new LoadManagementGroupsRequest()
@@ -110,6 +130,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
                 },
                 Fields = fields,
                 Live = _executionContextManager.GraphExecutionContext.QueryLive,
+                PointInTime = pointInTime,
             };
 
             var entityCollection = await _entityRepository.LoadManagementGroupsAsync(request, cancellationToken);

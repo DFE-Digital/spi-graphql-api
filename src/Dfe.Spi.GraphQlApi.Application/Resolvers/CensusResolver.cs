@@ -102,7 +102,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
         {
             var managementGroup = context.Source as ManagementGroup;
             var links = await _registryProvider.GetLinksAsync("management-groups",
-                SourceSystemNames.GetInformationAboutSchools, managementGroup.Code, context.CancellationToken);
+                SourceSystemNames.GetInformationAboutSchools, managementGroup.Code, null, context.CancellationToken);
             var giasUrns = links
                 .Where(link => link.LinkType == "ManagementGroup")
                 .Select(link => long.Parse(link.SourceSystemId))

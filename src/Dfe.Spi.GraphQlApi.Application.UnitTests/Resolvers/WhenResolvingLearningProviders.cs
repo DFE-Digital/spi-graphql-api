@@ -148,6 +148,20 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
         [Test, AutoData]
+        public async Task ThenItShouldUsePointInTimeArgumentIfSpecified(DateTime pointInTime)
+        {
+            var context = BuildResolveFieldContext(pointInTime: pointInTime);
+
+            await _resolver.ResolveAsync(context);
+
+            _entityRepositoryMock.Verify(er => er.LoadLearningProvidersAsync(
+                    It.Is<LoadLearningProvidersRequest>(r =>
+                        r.PointInTime == pointInTime),
+                    context.CancellationToken),
+                Times.Once);
+        }
+
+        [Test, AutoData]
         public async Task ThenItShouldUseBuiltEntityReferencesToLoadData(AggregateEntityReference[] entityReferences)
         {
             _registryProviderMock.Setup(r =>
@@ -286,7 +300,7 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
         }
 
 
-        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null, int? skip = null, int? take = null)
+        private ResolveFieldContext<object> BuildResolveFieldContext(string name = null, string[] fields = null, int? skip = null, int? take = null, DateTime? pointInTime = null)
         {
             var groups = new List<object>
             {
@@ -325,6 +339,11 @@ namespace Dfe.Spi.GraphQlApi.Application.UnitTests.Resolvers
             if (take.HasValue)
             {
                 arguments.Add("take", take.Value);
+            }
+            
+            if (pointInTime.HasValue)
+            {
+                arguments.Add("pointInTime", pointInTime);
             }
 
             var context = TestHelper.BuildResolveFieldContext<object>(arguments: arguments, fields: new[] {"results", "_pagination"});

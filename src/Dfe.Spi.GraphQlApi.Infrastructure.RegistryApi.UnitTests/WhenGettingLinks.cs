@@ -59,10 +59,9 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldRequestLinksFromApi(string entityType, string sourceSystem,
-            string sourceSystemId)
+        public async Task ThenItShouldRequestLinksFromApi(string entityType, string sourceSystem, string sourceSystemId)
         {
-            await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken);
+            await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, null, _cancellationToken);
 
             _restClientMock.Verify(c => c.ExecuteTaskAsync(It.Is<RestRequest>(req =>
                     req.Method == Method.GET &&
@@ -71,8 +70,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldReturnEntityReferenceLinksFromResult(string entityType, string sourceSystem,
-            string sourceSystemId,
+        public async Task ThenItShouldReturnEntityReferenceLinksFromResult(string entityType, string sourceSystem, string sourceSystemId, 
             EntityLinkReference[] links)
         {
             _restClientMock.Setup(c => c.ExecuteTaskAsync(It.IsAny<RestRequest>(), _cancellationToken))
@@ -86,7 +84,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
                     ResponseStatus = ResponseStatus.Completed,
                 });
 
-            var actual = await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken);
+            var actual = await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, null, _cancellationToken);
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(links.Length, actual.Length);
@@ -112,7 +110,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
                     ResponseStatus = ResponseStatus.Completed,
                 });
 
-            var actual = await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken);
+            var actual = await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, null, _cancellationToken);
 
             Assert.IsNotNull(actual);
             Assert.IsEmpty(actual);
@@ -130,7 +128,7 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi.UnitTests
                 });
 
             Assert.ThrowsAsync<RegistryApiException>(async () =>
-                await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, _cancellationToken));
+                await _provider.GetLinksAsync(entityType, sourceSystem, sourceSystemId, null, _cancellationToken));
         }
     }
 }

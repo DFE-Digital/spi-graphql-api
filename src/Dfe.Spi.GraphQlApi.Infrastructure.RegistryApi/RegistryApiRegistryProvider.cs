@@ -82,10 +82,14 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi
 
             return results.Synonyms;
         }
-        public async Task<EntityLinkReference[]> GetLinksAsync(string entityType, string sourceSystem, string sourceSystemId,
+        public async Task<EntityLinkReference[]> GetLinksAsync(string entityType, string sourceSystem, string sourceSystemId, DateTime? pointInTime,
             CancellationToken cancellationToken)
         {
             var resource = $"{entityType}/{sourceSystem}/{sourceSystemId}/links";
+            if (pointInTime.HasValue)
+            {
+                resource += $"?pointInTime={pointInTime:yyyy-MM-dd}";
+            }
             _logger.Debug($"Looking up links at {resource}");
             
             var httpRequest = new RestRequest(resource, Method.GET);
