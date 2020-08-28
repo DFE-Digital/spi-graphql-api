@@ -44,9 +44,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 if (context.Source is Models.Entities.LearningProvider learningProvider)
                 {
-                    var pointInTime = GetPointInTime(context);
-                    
-                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, pointInTime, context.CancellationToken);
+                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, null, context.CancellationToken);
                     if (managementGroupReference == null)
                     {
                         return null;
@@ -54,7 +52,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
 
                     var fields = GetRequestedFields(context);
                     var managementGroup =
-                        await GetManagementGroup(managementGroupReference, fields, pointInTime, context.CancellationToken);
+                        await GetManagementGroup(managementGroupReference, fields, null, context.CancellationToken);
                     return managementGroup;
                 }
 
