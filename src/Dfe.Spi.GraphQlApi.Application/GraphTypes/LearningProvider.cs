@@ -393,11 +393,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
                 resolve: lineageResolver.ResolveAsync);
 
             Field<ManagementGroup>("managementGroup",
-                resolve: managementGroupResolver.ResolveAsync,
-                arguments: new QueryArguments(new QueryArgument[]
-                {
-                    new QueryArgument<DateGraphType> {Name = "pointInTime"},
-                }));
+                resolve: managementGroupResolver.ResolveAsync);
 
             Field<Census>("census",
                 resolve: censusResolver.ResolveAsync,
