@@ -80,8 +80,8 @@ namespace Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi.UnitTests
                         AdapterRecordReferences = er.AdapterRecordReferences.Select(arr =>
                             new SquasherAdapterReference
                             {
-                                Source = arr.SourceSystemName,
-                                Id = arr.SourceSystemId,
+                                SourceSystemName = arr.SourceSystemName,
+                                SourceSystemId = arr.SourceSystemId,
                             }).ToArray(),
                     }).ToArray(),
                 Fields = request.Fields,

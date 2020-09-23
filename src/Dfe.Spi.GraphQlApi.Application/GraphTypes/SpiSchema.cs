@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Domain.Graph;
 using GraphQL;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 
 namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
@@ -9,11 +10,13 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
     public class SpiSchema : Schema
     {
         private readonly ILoggerWrapper _logger;
+        private DataLoaderDocumentListener _dataLoaderDocumentListener;
 
         public SpiSchema(IDependencyResolver resolver) : base(resolver)
         {
             Query = resolver.Resolve<SpiQuery>();
 
+            _dataLoaderDocumentListener = resolver.Resolve<DataLoaderDocumentListener>();
             _logger = resolver.Resolve<ILoggerWrapper>();
         }
 
@@ -25,7 +28,7 @@ namespace Dfe.Spi.GraphQlApi.Application.GraphTypes
             {
                 _.Query = request.Query;
                 _.Inputs = request.Variables.ToInputs();
-                // _.Inputs = request.Variables != null ? new GraphQL.Inputs(request.Variables) : null;
+                _.Listeners.Add(_dataLoaderDocumentListener);
             });
             _logger.Info($"Got query result {result}");
 

@@ -10,6 +10,7 @@ using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Enums;
 using Dfe.Spi.GraphQlApi.Application.GraphTypes.Inputs;
+using Dfe.Spi.GraphQlApi.Application.Loaders;
 using Dfe.Spi.GraphQlApi.Application.Resolvers;
 using Dfe.Spi.GraphQlApi.Domain.Configuration;
 using Dfe.Spi.GraphQlApi.Domain.Context;
@@ -21,6 +22,7 @@ using Dfe.Spi.GraphQlApi.Infrastructure.RegistryApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.SquasherApi;
 using Dfe.Spi.GraphQlApi.Infrastructure.TranslatorApi;
 using GraphQL;
+using GraphQL.DataLoader;
 using GraphQL.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Logging;
@@ -59,6 +61,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             AddEntityRepository(services);
             AddEnumerationRepository(services);
             AddResolvers(services);
+            AddLoaders(services);
             AddGraphQL(services);
 
             services
@@ -120,6 +123,23 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<IEnumerationLoader, EnumerationLoader>();
         }
 
+        private void AddLoaders(IServiceCollection services)
+        {
+            services.AddScoped<ILoader<LearningProviderPointer, Models.Entities.ManagementGroup>, LearningProviderManagementGroupLoader>();
+            // var loaderType = typeof(ILoader<,>);
+            // var loaders = loaderType.Assembly.GetTypes()
+            //     .Where(t => t.GetInterface(loaderType.FullName) != null && t.IsClass);
+            // foreach (var loader in loaders)
+            // {
+            //     var parentResolverInterfaces =
+            //         loader.GetInterfaces().Where(t => t.GetInterface(loaderType.FullName) != null);
+            //     foreach (var parentResolverInterface in parentResolverInterfaces)
+            //     {
+            //         services.AddScoped(parentResolverInterface, loader);
+            //     }
+            // }
+        }
+
         private void AddGraphQL(IServiceCollection services)
         {
             services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver((type) =>
@@ -127,6 +147,8 @@ namespace Dfe.Spi.GraphQlApi.Functions
                 var instance = s.GetRequiredService(type);
                 return instance;
             }));
+            services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
+            services.AddSingleton<DataLoaderDocumentListener>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
             
