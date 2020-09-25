@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Dfe.Spi.Common.Logging.Definitions;
 using Dfe.Spi.Common.WellKnownIdentifiers;
+using Dfe.Spi.GraphQlApi.Application.Loaders;
 using Dfe.Spi.GraphQlApi.Domain.Common;
 using Dfe.Spi.GraphQlApi.Domain.Context;
 using Dfe.Spi.GraphQlApi.Domain.Registry;
 using Dfe.Spi.GraphQlApi.Domain.Repository;
 using Dfe.Spi.Models.Entities;
 using GraphQL;
+using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -23,17 +23,23 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
     {
         private readonly IRegistryProvider _registryProvider;
         private readonly IEntityRepository _entityRepository;
+        private readonly IDataLoaderContextAccessor _accessor;
+        private readonly ILoader<LearningProviderPointer, ManagementGroup> _loader;
         private readonly IGraphExecutionContextManager _executionContextManager;
         private readonly ILoggerWrapper _logger;
 
         public ManagementGroupResolver(
             IRegistryProvider registryProvider,
             IEntityRepository entityRepository,
+            IDataLoaderContextAccessor accessor, 
+            ILoader<LearningProviderPointer, ManagementGroup> loader,
             IGraphExecutionContextManager executionContextManager,
             ILoggerWrapper logger)
         {
             _registryProvider = registryProvider;
             _entityRepository = entityRepository;
+            _accessor = accessor;
+            _loader = loader;
             _executionContextManager = executionContextManager;
             _logger = logger;
         }
@@ -44,16 +50,43 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             {
                 if (context.Source is Models.Entities.LearningProvider learningProvider)
                 {
-                    var managementGroupReference = await GetEntityReferenceAsync(learningProvider, null, context.CancellationToken);
-                    if (managementGroupReference == null)
+                    if (_accessor == null)
+                    {
+                        throw new Exception("_accessor null");
+                    }
+                    if (_loader == null)
+                    {
+                        throw new Exception("_loader null");
+                    }
+                    
+                    LearningProviderPointer pointer;
+                    if (learningProvider.Urn.HasValue)
+                    {
+                        pointer = new LearningProviderPointer
+                        {
+                            SourceSystemName = SourceSystemNames.GetInformationAboutSchools,
+                            SourceSystemId = learningProvider.Urn.Value.ToString(),
+                        };
+                    }
+                    else if (learningProvider.Ukprn.HasValue)
+                    {
+                        pointer = new LearningProviderPointer
+                        {
+                            SourceSystemName = SourceSystemNames.UkRegisterOfLearningProviders,
+                            SourceSystemId = learningProvider.Ukprn.Value.ToString(),
+                        };
+                    }
+                    else
                     {
                         return null;
                     }
 
-                    var fields = GetRequestedFields(context);
-                    var managementGroup =
-                        await GetManagementGroup(managementGroupReference, fields, null, context.CancellationToken);
-                    return managementGroup;
+                    pointer.Fields = GetRequestedFields(context);
+                    pointer.PointInTime = GetPointInTime(context);
+                    
+                    var loader = _accessor.Context.GetOrAddBatchLoader<LearningProviderPointer, ManagementGroup>(
+                        "GetLearningProviderManagementGroup", _loader.LoadAsync);
+                    return await loader.LoadAsync(pointer);
                 }
 
                 return null;
@@ -86,53 +119,6 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             }
 
             return parent.Arguments.GetPointInTimeArgument();
-        }
-
-
-        private async Task<EntityReference> GetEntityReferenceAsync(LearningProvider learningProvider, DateTime? pointInTime, CancellationToken cancellationToken)
-        {
-            string sourceSystemName;
-            string sourceSystemId;
-            if (learningProvider.Urn.HasValue)
-            {
-                sourceSystemName = SourceSystemNames.GetInformationAboutSchools;
-                sourceSystemId = learningProvider.Urn.Value.ToString();
-            }
-            else if (learningProvider.Ukprn.HasValue)
-            {
-                sourceSystemName = SourceSystemNames.UkRegisterOfLearningProviders;
-                sourceSystemId = learningProvider.Ukprn.Value.ToString();
-            }
-            else
-            {
-                return null;
-            }
-            
-            var links = await _registryProvider.GetLinksAsync("learning-providers", sourceSystemName, sourceSystemId, pointInTime, cancellationToken);
-            var managementGroupLink = links?.FirstOrDefault(l =>
-                l.LinkType.Equals("ManagementGroup", StringComparison.InvariantCultureIgnoreCase));
-            return managementGroupLink;
-        }
-
-        private async Task<ManagementGroup> GetManagementGroup(EntityReference managementGroupReference, string[] fields, DateTime? pointInTime,
-            CancellationToken cancellationToken)
-        {
-            var request = new LoadManagementGroupsRequest()
-            {
-                EntityReferences = new[]
-                {
-                    new AggregateEntityReference
-                    {
-                        AdapterRecordReferences = new []{managementGroupReference}
-                    }, 
-                },
-                Fields = fields,
-                Live = _executionContextManager.GraphExecutionContext.QueryLive,
-                PointInTime = pointInTime,
-            };
-
-            var entityCollection = await _entityRepository.LoadManagementGroupsAsync(request, cancellationToken);
-            return entityCollection.SquashedEntityResults.Select(x => x.SquashedEntity).SingleOrDefault();
         }
 
         private string[] GetRequestedFields<T>(ResolveFieldContext<T> context)
