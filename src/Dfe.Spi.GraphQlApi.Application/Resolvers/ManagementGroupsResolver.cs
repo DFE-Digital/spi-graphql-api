@@ -89,6 +89,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             string[] fields,
             CancellationToken cancellationToken)
         {
+            if (references.Length == 0)
+            {
+                return new ManagementGroup[0];
+            }
+            
             var request = new LoadManagementGroupsRequest
             {
                 EntityReferences = references,

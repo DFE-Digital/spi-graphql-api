@@ -107,6 +107,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Loaders
                     });
                 }
             }
+
+            if (managementGroupPointers.Count == 0)
+            {
+                return new SquashedEntityResult<ManagementGroup>[0];
+            }
             
             var request = new LoadManagementGroupsRequest()
             {
