@@ -90,6 +90,11 @@ namespace Dfe.Spi.GraphQlApi.Application.Resolvers
             string[] fields,
             CancellationToken cancellationToken)
         {
+            if (references.Length == 0)
+            {
+                return new LearningProvider[0];
+            }
+            
             var request = new LoadLearningProvidersRequest
             {
                 EntityReferences = references,
