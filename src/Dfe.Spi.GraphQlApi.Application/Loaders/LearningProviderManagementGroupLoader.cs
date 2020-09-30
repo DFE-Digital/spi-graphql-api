@@ -41,9 +41,9 @@ namespace Dfe.Spi.GraphQlApi.Application.Loaders
             var managementGroupLinks = await GetManagementGroupLinksAsync(learningProviderPointers, cancellationToken);
 
             var managementGroups = await LoadManagementGroupsAsync(
-                managementGroupLinks, 
-                learningProviderPointers.FirstOrDefault()?.Fields, 
-                learningProviderPointers.FirstOrDefault()?.PointInTime, 
+                managementGroupLinks,
+                learningProviderPointers.FirstOrDefault()?.Fields,
+                learningProviderPointers.FirstOrDefault()?.PointInTime,
                 cancellationToken);
 
             var results = TransformToDictionary(learningProviderPointers, managementGroupLinks, managementGroups);
@@ -84,35 +84,32 @@ namespace Dfe.Spi.GraphQlApi.Application.Loaders
         {
             _logger.Debug($"Loading {links.Length} management groups");
 
-            var managementGroupPointers = new List<AggregateEntityReference>();
-            foreach (var batchResult in links)
-            {
-                if (batchResult.Links == null)
-                {
-                    continue;
-                }
-
-                foreach (var link in batchResult.Links)
-                {
-                    managementGroupPointers.Add(new AggregateEntityReference
+            // Get distinct list of pointers to squash (multiple providers might be linked to same management group)
+            var managementGroupPointers = links
+                .Where(result => result.Links != null)
+                .SelectMany(result => result.Links.Select(link =>
+                    new EntityReference
                     {
-                        AdapterRecordReferences = new[]
-                        {
-                            new EntityReference
-                            {
-                                SourceSystemName = link.SourceSystemName,
-                                SourceSystemId = link.SourceSystemId,
-                            },
-                        },
-                    });
-                }
-            }
+                        SourceSystemName = link.SourceSystemName,
+                        SourceSystemId = link.SourceSystemId,
+                    }))
+                .GroupBy(x => $"{x.SourceSystemName.ToLower()}:{x.SourceSystemId.ToLower()}")
+                .Select(x => new AggregateEntityReference
+                {
+                    AdapterRecordReferences = new[]
+                    {
+                        x.First(),
+                    },
+                })
+                .ToArray();
 
-            if (managementGroupPointers.Count == 0)
+            // If there are not references then don't try loading
+            if (managementGroupPointers.Length == 0)
             {
                 return new SquashedEntityResult<ManagementGroup>[0];
             }
-            
+
+            // Got to Squash'em all
             var request = new LoadManagementGroupsRequest()
             {
                 EntityReferences = managementGroupPointers.ToArray(),
@@ -122,8 +119,6 @@ namespace Dfe.Spi.GraphQlApi.Application.Loaders
             };
 
             var entityCollection = await _entityRepository.LoadManagementGroupsAsync(request, cancellationToken);
-
-            var results = new Dictionary<TypedEntityReference, ManagementGroup>();
 
             return entityCollection.SquashedEntityResults;
         }
@@ -146,7 +141,7 @@ namespace Dfe.Spi.GraphQlApi.Application.Loaders
                         ar.SourceSystemName.Equals(managementGroupPointer.SourceSystemName, StringComparison.InvariantCultureIgnoreCase) &&
                         ar.SourceSystemId.Equals(managementGroupPointer.SourceSystemId, StringComparison.InvariantCultureIgnoreCase)))?.SquashedEntity
                     : null;
-                
+
                 results.Add(learningProviderPointer, managementGroup);
             }
 
