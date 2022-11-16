@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 
-        <IsPackable>false</IsPackable>
+		<IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,7 +13,7 @@
         <PackageReference Include="nunit" Version="3.12.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
-        <PackageReference Include="RestSharp" Version="106.6.10" />
+        <PackageReference Include="RestSharp" Version="106.15.0" />
     </ItemGroup>
 
     <ItemGroup>
