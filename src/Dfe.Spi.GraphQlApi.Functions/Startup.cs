@@ -88,16 +88,16 @@ namespace Dfe.Spi.GraphQlApi.Functions
         private void AddLogging(IServiceCollection services)
         {
             services.AddLogging();
-            services.AddScoped(typeof(ILogger<>), typeof(Logger<>));
-            services.AddScoped<ILogger>(provider =>
+            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+            services.AddSingleton<ILogger>(provider =>
                 provider.GetService<ILoggerFactory>().CreateLogger(LogCategories.CreateFunctionUserCategory("GraphQl")));
 
-            services.AddScoped<IGraphExecutionContextManager, HttpGraphExecutionContextManager>();
-            services.AddScoped<IHttpSpiExecutionContextManager>((provider) =>
-                (IHttpSpiExecutionContextManager) provider.GetService(typeof(IGraphExecutionContextManager)));
-            services.AddScoped<ISpiExecutionContextManager>((provider) =>
-                (ISpiExecutionContextManager) provider.GetService(typeof(IHttpSpiExecutionContextManager)));
-            services.AddScoped<ILoggerWrapper, LoggerWrapper>();
+            services.AddSingleton<IGraphExecutionContextManager, HttpGraphExecutionContextManager>();
+            services.AddSingleton<IHttpSpiExecutionContextManager>((provider) =>
+                (IHttpSpiExecutionContextManager)provider.GetService(typeof(IGraphExecutionContextManager)));
+            services.AddSingleton<ISpiExecutionContextManager>((provider) =>
+                (ISpiExecutionContextManager)provider.GetService(typeof(IHttpSpiExecutionContextManager)));
+            services.AddSingleton<ILoggerWrapper, LoggerWrapper>();
         }
 
         private void AddHttp(IServiceCollection services)
@@ -151,7 +151,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddSingleton<DataLoaderDocumentListener>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
-            
+
             // enums
             services.AddScoped<AdmissionsPolicyEnum>();
             services.AddScoped<CensusAggregationFieldsEnum>();
@@ -159,14 +159,14 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<LearningProviderSubTypeEnum>();
             services.AddScoped<LearningProviderTypeEnum>();
             services.AddScoped<OperatorEnum>();
-            
+
             // inputs
             services.AddScoped<ComplexQueryCondition>();
             services.AddScoped<ComplexQueryGroup>();
             services.AddScoped<ComplexQuery>();
             services.AddScoped<Application.GraphTypes.Inputs.AggregationRequestCondition>();
             services.AddScoped<Application.GraphTypes.Inputs.AggregationRequest>();
-            
+
             // entities
             services.AddScoped<Application.GraphTypes.Census>();
             services.AddScoped<Application.GraphTypes.Aggregation>();
@@ -183,7 +183,7 @@ namespace Dfe.Spi.GraphQlApi.Functions
             services.AddScoped<Application.GraphTypes.NotionalFunding>();
             services.AddScoped<Application.GraphTypes.ManagementGroupProvisionalFunding>();
             services.AddScoped<Application.GraphTypes.ManagementGroupRates>();
-            
+
             // schema
             services.AddScoped<SpiQuery>();
             services.AddScoped<SpiSchema>();
